@@ -1,7 +1,10 @@
 // BinaryTree.h
-// This file contains declarations for a linked binary tree with limited functions.
+// Interface of the binary tree
 
-#ifndef BINARYTREE_H
+#ifndef LINKEDTREE_H
+#define LINKEDTREE_H
+
+#include <cstdlib>
 
 template <class T> class Node;
 template <class T> class BinaryTree;
@@ -9,27 +12,51 @@ template <class T> class BinaryTreeIterator;
 
 template <class T>
 class Node {
+public:
+    Node();
+    Node(const T &content, Node<T> *lchild = NULL, Node<T> *rchild = NULL);
 private:
     T content;
     Node<T> *lchild, *rchild;
-public:
-    Node();
-    Node(const T &content, Node<T> *lchild, Node<T> *rchild);
     friend class BinaryTree<T>;
+    friend class BinaryTreeIterator<T>;
 };
 
 template <class T>
 class BinaryTree {
-private:
-    Node<T> *anchor;
 public:
     typedef BinaryTreeIterator<T> Iterator;
     BinaryTree();
     BinaryTree(const BinaryTree &rhs);
-    BinaryTree(const T &content);
+    BinaryTree(const T &src);
     ~BinaryTree();
-    Iterator root();
-    Iterator root(lchild)
+    T &operator[](int seq);
+    const T &operator[](int seq) const;
+    Iterator root() const;
+    BinaryTree<T> subTree(const Iterator &iter) const;
+    void move(const Iterator &iter, BinaryTree<T> &src);
+    void clear();
+    friend class BinaryTreeIterator<T>;
+private:
+    Node<T> *anchor;
+    void clear(Node<T> *target);
 };
+
+template <class T>
+class BinaryTreeIterator {
+public:
+    BinaryTreeIterator(Node<T> *&p);
+    T &operator*() const;
+    T *operator->() const;
+    bool null() const;
+    BinaryTreeIterator<T> lchild() const;
+    BinaryTreeIterator<T> rchild() const;
+    BinaryTreeIterator<T> go(int seq) const;
+    friend class BinaryTree<T>;
+private:
+    Node<T> **p;
+};
+
+#include "BinaryTree.ipp"
 
 #endif

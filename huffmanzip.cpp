@@ -1,5 +1,5 @@
 // huffmanzip.cpp
-// This file contains the main module.
+// Main module
 
 #include <iostream>
 
