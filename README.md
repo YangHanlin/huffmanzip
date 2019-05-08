@@ -8,7 +8,7 @@ Huffmanzip is a (toy) single-file, command-line compressor & decompressor, using
 
 Huffmanzip is:
 
-- **simple**: the code is simple enough to illustrate the the application of Huffman coding and Huffman trees; actually, it is one of the homework of the course *Data Structures & Algorithms* in my university;
+- **simple**: the code is simple enough to illustrate the application of Huffman coding and Huffman trees; actually, it is one of the homework of my college course *Data Structures & Algorithms*;
 - **modular**: the program is divided into several separate modules between which they communicate with unified interfaces;
 - **cross-platform**: the program is written in C++ and only depends on the standard libraries of C++ delivered with the compiler;
 - **designed for general purposes**: the program is designed for general binary files, rather than limited to plain-text files, even ASCII files.
