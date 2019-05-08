@@ -51,7 +51,7 @@ Building with other compilers and/or in other environments are similar with abov
 
 If you are using an IDE the building may be easier. Add the source files to create a project and select `Build` or similar actions. Find the built executable in the corresponding directory.
 
-> **Note**: If you are experiencing some strange problems while building, try only adding `huffmanzip.cpp` into your project. This may be caused by the IDE not recognizing the `.ipp` files as headers, and due to the special structure of this program, only adding `huffmanzip.cpp` works as well.
+> **Note**: If you are experiencing some strange problems while building, try only adding `huffmanzip.cpp` into your project and force it to build again. This may be caused by the IDE not recognizing the `.ipp` files as headers, and due to the special structure of this program, only adding `huffmanzip.cpp` works as well.
 
 ## Contributing
 
