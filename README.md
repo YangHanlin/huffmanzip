@@ -19,7 +19,7 @@ The usage of Huffmanzip is inspired by [GNU Gzip](https://www.gnu.org/software/g
 
 > [WIP] Work in progress; please wait.
 
-## Build from source
+## Building from source
 
 ### Dependencies
 
