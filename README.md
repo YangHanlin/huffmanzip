@@ -42,7 +42,7 @@ then run
 
 ```shell
 # Show help info to insure it is built
-$ ./huffmanzip
+$ ./huffmanzip --help
 ```
 
 Building with other compilers and/or in other environments are similar with above.
