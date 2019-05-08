@@ -51,7 +51,7 @@ If you are using an IDE the building may be easier. Add the source files to crea
 
 ## Contributing
 
-This is only a toy project and may contain many problems owing to my poor programming skills. If you are happy to help me improve Huffmanzip, just be free to fork it and create a pull request.
+This is only a toy project and may contain many problems owing to my poor programming skills. If you are happy to help me improve Huffmanzip, just be free to fork it and create a pull request. Issues are welcomed as well :-)
 
 ## License
 
