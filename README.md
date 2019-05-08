@@ -4,7 +4,7 @@
 
 **Important**: The developer is still working on this project; it will not be ready until after some time.
 
-Huffmanzip is a (toy) single-file, command-line compressor & decompressor, using Huffman coding to reduce the size of the file being compressed.
+Huffmanzip is a single-file, command-line (toy) compressor & decompressor, using Huffman coding to reduce the size of the file being compressed.
 
 Huffmanzip is:
 
