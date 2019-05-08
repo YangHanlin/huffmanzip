@@ -1,6 +1,6 @@
 # Huffmanzip
 
-[![Issues](https://img.shields.io/github/issues/YangHanlin/huffmanzip.svg)](https://github.com/YangHanlin/huffmanzip/issues) ![GitHub pull requests](https://img.shields.io/github/issues-pr/YangHanlin/huffmanzip.svg) [![License](https://img.shields.io/github/license/YangHanlin/huffmanzip.svg)](https://github.com/YangHanlin/huffmanzip/blob/master/LICENSE)
+[![Issues](https://img.shields.io/github/issues/YangHanlin/huffmanzip.svg)](https://github.com/YangHanlin/huffmanzip/issues) ![Pull requests](https://img.shields.io/github/issues-pr/YangHanlin/huffmanzip.svg) [![License](https://img.shields.io/github/license/YangHanlin/huffmanzip.svg)](https://github.com/YangHanlin/huffmanzip/blob/master/LICENSE)
 
 Huffmanzip is a (toy) single-file, command-line compressor & decompressor, using Huffman coding to reduce the size of the file being compressed.
 
