@@ -59,4 +59,4 @@ This is only a toy project and may contain many problems owing to my poor progra
 
 ## License
 
-MIT
+[MIT](https://github.com/YangHanlin/huffmanzip/blob/master/LICENSE)
