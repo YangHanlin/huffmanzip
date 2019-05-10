@@ -35,14 +35,14 @@ Take G++ and Linux shell as an example:
 
 ```shell
 # Compile the main source file
-$ g++ huffmanzip.cpp -o huffmanzip
+g++ huffmanzip.cpp -o huffmanzip
 ```
 
 then run
 
 ```shell
 # Show help info to insure it is built
-$ ./huffmanzip --help
+./huffmanzip --help
 ```
 
 Building with other compilers and/or in other environments are similar with above.
