@@ -17,7 +17,7 @@ Huffmanzip is:
 
 The usage of Huffmanzip is inspired by [GNU Gzip](https://www.gnu.org/software/gzip/), therefore most of the features and usages may be similar with it.
 
-> [WIP] A comprehensive reference can be accessed [here](https://github.com/YangHanlin/huffmanzip/wiki/Usage-of-Huffmanzip) in the wiki. A more friendly usage (`Quick Start` or `TL;DR`) will be available here in this README later.
+> [WIP] A reference can be accessed [here](https://github.com/YangHanlin/huffmanzip/wiki/Usage-of-Huffmanzip) in the wiki. A more friendly usage (`Quick Start` or `TL;DR`) will be available here in this README later.
 
 ## Building from source
 
