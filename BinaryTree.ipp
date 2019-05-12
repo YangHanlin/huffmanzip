@@ -33,6 +33,12 @@ BinaryTree<T>::~BinaryTree() {
 }
 
 template <class T>
+BinaryTree<T> &BinaryTree<T>::operator=(const BinaryTree &rhs) {
+    copy(root(), rhs.root());
+    return *this;
+}
+
+template <class T>
 T &BinaryTree<T>::operator[](int seq) {
     return *root().go(seq);
 }

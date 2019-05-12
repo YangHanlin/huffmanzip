@@ -33,6 +33,7 @@ public:
     BinaryTree(const BinaryTree &rhs);
     BinaryTree(const T &src);
     ~BinaryTree();
+    BinaryTree<T> &operator=(const BinaryTree<T> &rhs);
     T &operator[](int seq);
     const T &operator[](int seq) const;
     Iterator root();
