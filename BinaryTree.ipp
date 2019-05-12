@@ -84,7 +84,7 @@ void BinaryTree<T>::clear(const Iterator &iter) {
 }
 
 template <class T>
-void BinaryTree<T>::copy(Node<T> *&to, const Node<T> *&from) {
+void BinaryTree<T>::copy(Node<T> *&to, const Node<T> * const &from) {
     if (from == NULL)
         return;
     to = new Node<T>(from->content, NULL, NULL);
@@ -92,9 +92,8 @@ void BinaryTree<T>::copy(Node<T> *&to, const Node<T> *&from) {
     copy(to->rchild, from->rchild);
 }
 
-
 template <class T>
-void clear(Node<T> *&target) {
+void BinaryTree<T>::clear(Node<T> *&target) {
     if (target == NULL)
         return;
     clear(target->lchild);

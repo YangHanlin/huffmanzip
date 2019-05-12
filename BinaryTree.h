@@ -44,7 +44,7 @@ public:
     static void clear(const Iterator &iter);
 private:
     Node<T> *anchor;
-    static void copy(Node<T> *&to, const Node<T> *&from);
+    static void copy(Node<T> *&to, const Node<T> * const &from);
     static void clear(Node<T> *&target);
     friend class BinaryTreeIterator<T>;
     friend class BinaryTreeConstIterator<T>;
