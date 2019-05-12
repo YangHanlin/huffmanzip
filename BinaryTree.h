@@ -9,6 +9,7 @@
 template <class T> class Node;
 template <class T> class BinaryTree;
 template <class T> class BinaryTreeIterator;
+template <class T> class BinaryTreeConstIterator;
 
 template <class T>
 class Node {
@@ -20,26 +21,32 @@ private:
     Node<T> *lchild, *rchild;
     friend class BinaryTree<T>;
     friend class BinaryTreeIterator<T>;
+    friend class BinaryTreeConstIterator<T>;
 };
 
 template <class T>
 class BinaryTree {
 public:
     typedef BinaryTreeIterator<T> Iterator;
+    typedef BinaryTreeConstIterator<T> ConstIterator;
     BinaryTree();
     BinaryTree(const BinaryTree &rhs);
     BinaryTree(const T &src);
     ~BinaryTree();
     T &operator[](int seq);
     const T &operator[](int seq) const;
-    Iterator root() const;
-    BinaryTree<T> subTree(const Iterator &iter) const;
-    void move(const Iterator &iter, BinaryTree<T> &src);
+    Iterator root();
+    ConstIterator root() const;
+    static void copy(const Iterator &to, const ConstIterator &from);
+    static void move(const Iterator &to, const Iterator &from);
     void clear();
-    friend class BinaryTreeIterator<T>;
+    static void clear(const Iterator &iter);
 private:
     Node<T> *anchor;
-    void clear(Node<T> *target);
+    static void copy(Node<T> *&to, const Node<T> *&from)
+    static void clear(Node<T> *&target);
+    friend class BinaryTreeIterator<T>;
+    friend class BinaryTreeConstIterator<T>;
 };
 
 template <class T>
@@ -54,7 +61,25 @@ public:
     BinaryTreeIterator<T> go(int seq) const;
     friend class BinaryTree<T>;
 private:
+    BinaryTreeIterator<T> &go(int seq, BinaryTreeIterator<T> &res) const;
     Node<T> **p;
+};
+
+template <class T>
+class BinaryTreeConstIterator {
+public:
+    BinaryTreeConstIterator(const Node<T> *&p)
+    BinaryTreeConstIterator(const BinaryTreeIterator &iter);
+    const T &operator*() const;
+    const T *operator->() const;
+    bool null() const;
+    BinaryTreeConstIterator<T> lchild() const;
+    BinaryTreeConstIterator<T> rchild() const;
+    BinaryTreeConstIterator<T> go(int seq) const;
+    friend class BinaryTree<T>;
+private:
+    BinaryTreeConstIterator<T> &go(int seq, BinaryTreeConstIterator<T> &res) const;
+    const Node<T> **p;
 };
 
 #include "BinaryTree.ipp"
