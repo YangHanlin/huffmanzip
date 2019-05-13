@@ -25,3 +25,15 @@ void sendMessage(MessageType type, const string &msg) {
             throw runtime_error("Invalid MessageType (enum) value in sendMessage()");
     }
 }
+
+void showHelp() {
+    cout << "Usage: " << sessionSettings.programName << " [OPTION]... [FILE}..." << endl
+         << "Compress/decompress single files using Huffman coding." << endl
+         << endl
+         << "(N/A yet)" << endl;
+}
+
+void showVersion() {
+    cout << sessionSettings.programName << " version " << globalSettings.compressorVersionStr << " (" << globalSettings.compressorVersion << ")" << endl
+         << "Last built at " << __TIME__ << " on " << __DATE__ << endl;
+}

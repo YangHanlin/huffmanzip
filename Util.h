@@ -13,4 +13,7 @@ enum MessageType {
 
 void sendMessage(MessageType type, const std::string &msg);
 
+void showHelp();
+void showVersion();
+
 #endif
