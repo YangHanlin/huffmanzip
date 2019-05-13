@@ -9,6 +9,7 @@ struct GlobalSettings {
     static const int COMPRESSOR_IDENTIFIER_SIZE = 7;
     char compressorIdentifier[COMPRESSOR_IDENTIFIER_SIZE];
     unsigned compressorVersion;
+    std::string compressorVersionStr;
     unsigned fileSignature;
     GlobalSettings();
 };
@@ -17,6 +18,7 @@ struct SessionSettings {
     std::string programName;
     bool showHelp;
     bool showVersion;
+    bool compress;
     bool verboseMode;
     bool keepOriginalFile;
     bool useStdin;
