@@ -1,5 +1,4 @@
 // BinaryTree.ipp
-// binary tree module - implementation
 
 #ifndef BINARYTREE_IPP
 

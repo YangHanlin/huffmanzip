@@ -1,5 +1,4 @@
 // BinaryTree.h
-// binarytree module - interface
 
 #ifndef LINKEDTREE_H
 #define LINKEDTREE_H
