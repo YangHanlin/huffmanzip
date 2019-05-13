@@ -44,7 +44,7 @@ public:
     static void clear(const Iterator &iter);
 private:
     Node<T> *anchor;
-    static void copy(Node<T> *&to, const Node<T> * const &from);
+    static void copy(Node<T> *&to, Node<T> * const &from);
     static void clear(Node<T> *&target);
     friend class BinaryTreeIterator<T>;
     friend class BinaryTreeConstIterator<T>;
@@ -69,7 +69,7 @@ private:
 template <class T>
 class BinaryTreeConstIterator {
 public:
-    BinaryTreeConstIterator(const Node<T> *&p);
+    BinaryTreeConstIterator(Node<T> * const &p);
     BinaryTreeConstIterator(const BinaryTreeIterator<T> &iter);
     const T &operator*() const;
     const T *operator->() const;
@@ -80,7 +80,7 @@ public:
     friend class BinaryTree<T>;
 private:
     BinaryTreeConstIterator<T> &go(int seq, BinaryTreeConstIterator<T> &res) const;
-    const Node<T> **p;
+    Node<T> * const *p;
 };
 
 #include "BinaryTree.ipp"

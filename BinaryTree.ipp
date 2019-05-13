@@ -84,7 +84,7 @@ void BinaryTree<T>::clear(const Iterator &iter) {
 }
 
 template <class T>
-void BinaryTree<T>::copy(Node<T> *&to, const Node<T> * const &from) {
+void BinaryTree<T>::copy(Node<T> *&to, Node<T> * const &from) {
     if (from == NULL)
         return;
     to = new Node<T>(from->content, NULL, NULL);
@@ -149,7 +149,7 @@ BinaryTreeIterator<T> &BinaryTreeIterator<T>::go(int seq, BinaryTreeIterator<T> 
 }
 
 template <class T>
-BinaryTreeConstIterator<T>::BinaryTreeConstIterator(const Node<T> *&p) : p(&p) {}
+BinaryTreeConstIterator<T>::BinaryTreeConstIterator(Node<T> * const &p) : p(&p) {}
 
 template <class T>
 BinaryTreeConstIterator<T>::BinaryTreeConstIterator(const BinaryTreeIterator<T> &iter) : p(iter.p) {}
