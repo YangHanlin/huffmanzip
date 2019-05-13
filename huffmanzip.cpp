@@ -1,5 +1,4 @@
 // huffmanzip.cpp
-// main module
 
 #include <iostream>
 
