@@ -59,6 +59,11 @@ typename BinaryTree<T>::ConstIterator BinaryTree<T>::root() const {
 }
 
 template <class T>
+bool BinaryTree<T>::empty() const {
+    return anchor == NULL;
+}
+
+template <class T>
 void BinaryTree<T>::copy(const Iterator &to, const ConstIterator &from) {
     if (!to.null())
         clear(to);

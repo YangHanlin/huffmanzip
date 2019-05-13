@@ -38,6 +38,7 @@ public:
     const T &operator[](int seq) const;
     Iterator root();
     ConstIterator root() const;
+    bool empty() const;
     static void copy(const Iterator &to, const ConstIterator &from);
     static void move(const Iterator &to, const Iterator &from);
     void clear();
