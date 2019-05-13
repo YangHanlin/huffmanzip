@@ -64,6 +64,11 @@ bool BinaryTree<T>::empty() const {
 }
 
 template <class T>
+void BinaryTree<T>::insert(const Iterator &to, const T &src) {
+    copy(to, BinaryTree<T>(src).root());
+}
+
+template <class T>
 void BinaryTree<T>::copy(const Iterator &to, const ConstIterator &from) {
     clear(to);
     copy(*to.p, *from.p);

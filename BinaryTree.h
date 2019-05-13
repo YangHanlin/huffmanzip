@@ -39,6 +39,7 @@ public:
     Iterator root();
     ConstIterator root() const;
     bool empty() const;
+    static void insert(const Iterator &to, const T &src);
     static void copy(const Iterator &to, const ConstIterator &from);
     static void move(const Iterator &to, const Iterator &from);
     void clear();
