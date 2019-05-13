@@ -61,10 +61,11 @@ public:
     BinaryTreeIterator<T> lchild() const;
     BinaryTreeIterator<T> rchild() const;
     BinaryTreeIterator<T> go(int seq) const;
-    friend class BinaryTree<T>;
 private:
     BinaryTreeIterator<T> &go(int seq, BinaryTreeIterator<T> &res) const;
     Node<T> **p;
+    friend class BinaryTree<T>;
+    friend class BinaryTreeConstIterator<T>;
 };
 
 template <class T>
@@ -78,10 +79,10 @@ public:
     BinaryTreeConstIterator<T> lchild() const;
     BinaryTreeConstIterator<T> rchild() const;
     BinaryTreeConstIterator<T> go(int seq) const;
-    friend class BinaryTree<T>;
 private:
     BinaryTreeConstIterator<T> &go(int seq, BinaryTreeConstIterator<T> &res) const;
     Node<T> * const *p;
+    friend class BinaryTree<T>;
 };
 
 #include "BinaryTree.ipp"
