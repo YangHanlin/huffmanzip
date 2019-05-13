@@ -2,6 +2,8 @@
 
 [![Issues](https://img.shields.io/github/issues/YangHanlin/huffmanzip.svg)](https://github.com/YangHanlin/huffmanzip/issues) [![Pull requests](https://img.shields.io/github/issues-pr/YangHanlin/huffmanzip.svg)](https://github.com/YangHanlin/huffmanzip/pulls) [![License](https://img.shields.io/github/license/YangHanlin/huffmanzip.svg)](https://github.com/YangHanlin/huffmanzip/blob/master/LICENSE)
 
+> **Notice:** Before the first version of Huffmanzip releases, all documents in this repository may be inaccurate and out-of-date.
+
 **Important**: The developer is still working on this project; it will not be ready until after some time. Current status:
 
 ```
