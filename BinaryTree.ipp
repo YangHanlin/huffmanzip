@@ -65,8 +65,7 @@ bool BinaryTree<T>::empty() const {
 
 template <class T>
 void BinaryTree<T>::copy(const Iterator &to, const ConstIterator &from) {
-    if (!to.null())
-        clear(to);
+    clear(to);
     copy(*to.p, *from.p);
 }
 
