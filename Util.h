@@ -1,5 +1,8 @@
 // Util.h
 
+#ifndef UTIL_H
+#define UTIL_H
+
 #include <string>
 
 enum MessageType {
@@ -9,3 +12,5 @@ enum MessageType {
 };
 
 void sendMessage(MessageType type, const std::string &msg);
+
+#endif
