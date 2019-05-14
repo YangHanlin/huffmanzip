@@ -4,12 +4,16 @@
 #include "Util.h"
 
 #include <string>
+#include <sstream>
 #include <algorithm>
 #include <map>
+#include <stdexcept>
 
 using std::string;
+using std::ostringstream;
 using std::copy;
 using std::map;
+using std::runtime_error;
 
 struct Arg {
     char shortArg;
@@ -32,7 +36,7 @@ const unsigned defaultFileSignature = 0xaabbccddU;
 
 const string defaultProgramName = "huffmanzip";
 const bool defaultShowHelp = false;
-const bool defaultShowVersion = true;
+const bool defaultShowVersion = false;
 const bool defaultCompress = true;
 const bool defaultVerboseMode = false;
 const bool defaultKeepOriginalFile = true;
@@ -89,5 +93,52 @@ bool operator==(const Arg &lhs, const Arg &rhs) {
 }
 
 void parseArgs(int argc, char *argv[]) {
-    // ....
+    string programName = argv[0];
+    string::size_type pos = programName.find_last_of('/'),
+                      backslashPos = programName.find_last_of('\\');
+    if (backslashPos != string::npos && pos < backslashPos)
+        pos = backslashPos;
+    if (pos != string::npos)
+        programName = programName.substr(pos + 1);
+    if (!programName.empty())
+        sessionSettings.programName = programName;
+    bool needFurtherPath = false;
+    for (int i = 1; i < argc; ++i) {
+        if (argv[i][0] != '-') {
+            if (needFurtherPath) {
+                sessionSettings.outFilePath = argv[i][0];
+                needFurtherPath = false;
+            } else {
+                sessionSettings.inFilePath = argv[i][0];
+            }
+        } else if (argv[i][1] != '-') {
+            for (int j = 1; argv[i][j] != '\0'; ++j) {
+                if (argv[i][j] == 'o') {
+                    sessionSettings.useStdin = false;
+                    needFurtherPath = true;
+                } else {
+                    map<Arg, OptionChange>::const_iterator iter = argOptionMap.find(Arg(argv[i][j]));
+                    if (iter == argOptionMap.end()) {
+                        ostringstream errMsg;
+                        errMsg << "unrecognized option -" << argv[i][j];
+                        sendMessage(MSG_ERROR, errMsg.str());
+                        throw runtime_error(errMsg.str());
+                    } else {
+                        iter->second.target = iter->second.targetStatus;
+                    }
+                }
+            }
+        } else {
+            
+            map<Arg, OptionChange>::const_iterator iter = argOptionMap.find(Arg(argv[i] + 2));
+            if (iter == argOptionMap.end()) {
+                ostringstream errMsg;
+                errMsg << "unrecognized option " << argv[i];
+                sendMessage(MSG_ERROR, errMsg.str());
+                throw runtime_error(errMsg.str());
+            } else {
+                iter->second.target = iter->second.targetStatus;
+            }
+        }
+    }
 }
