@@ -25,6 +25,15 @@ const bool defaultUseStdout = false;
 const string defaultInFilePath = "";
 const string defaultOutFilePath = "";
 
+const map<Arg, OptionChange> argOptionMap = {
+    {Arg('c', "stdout"), OptionChange(sessionSettings.useStdout, true)},
+    {Arg('d', "decompress"), OptionChange(sessionSettings.compress, false)},
+    {Arg('h', "help"), OptionChange(sessionSettings.showHelp, true)},
+    {Arg('k', "no-keep"), OptionChange(sessionSettings.keepOriginalFile, false)},
+    {Arg('v', "verbose"), OptionChange(sessionSettings.verboseMode, true)},
+    {Arg('V', "version"), OptionChange(sessionSettings.showVersion, true)}
+};
+
 GlobalSettings globalSettings;
 SessionSettings sessionSettings;
 
@@ -46,7 +55,22 @@ SessionSettings::SessionSettings() :
     useStdout(defaultUseStdout),
     inFilePath(defaultInFilePath),
     outFilePath(defaultOutFilePath) {}
-    
+
+Arg::Arg(char shortArg, const string &longArg) : shortArg(shortArg), longArg(longArg) {}
+
+Arg::Arg(char shortArg) : shortArg(shortArg), longArg("") {}
+
+Arg::Arg(const string &longArg) : shortArg('\0'), longArg(longArg) {}
+
+OptionChange::OptionChange(bool &target, bool targetStatus) : target(target), targetStatus(targetStatus) {}
+
+bool operator<(const Arg &lhs, const Arg &rhs) {
+    return lhs.shortArg < rhs.shortArg;
+}
+
+bool operator==(const Arg &lhs, const Arg &rhs) {
+    return lhs.shortArg == rhs.shortArg || lhs.longArg == rhs.longArg;
+}
 
 void parseArgs(int argc, char *argv[]) {
     // ....
