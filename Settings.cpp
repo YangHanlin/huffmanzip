@@ -6,22 +6,15 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
-#include <map>
+#include <vector>
 #include <stdexcept>
 
 using std::string;
 using std::ostringstream;
 using std::copy;
-using std::map;
+using std::find;
+using std::vector;
 using std::runtime_error;
-
-struct Arg {
-    char shortArg;
-    string longArg;
-    Arg(char shortArg, const string &longArg);
-    Arg(char shortArg);
-    Arg(const string &longArg);
-};
 
 struct OptionChange {
     bool &target;
@@ -45,13 +38,22 @@ const bool defaultUseStdout = false;
 const string defaultInFilePath = "";
 const string defaultOutFilePath = "";
 
-const map<Arg, OptionChange> argOptionMap = {
-    {Arg('c', "stdout"), OptionChange(sessionSettings.useStdout, true)},
-    {Arg('d', "decompress"), OptionChange(sessionSettings.compress, false)},
-    {Arg('h', "help"), OptionChange(sessionSettings.showHelp, true)},
-    {Arg('k', "no-keep"), OptionChange(sessionSettings.keepOriginalFile, false)},
-    {Arg('v', "verbose"), OptionChange(sessionSettings.verboseMode, true)},
-    {Arg('V', "version"), OptionChange(sessionSettings.showVersion, true)}
+const vector<char> shortArgs = {'c', 'd', 'h', 'k', 'v', 'V'};
+const vector<string> longArgs = {
+    "stdout",
+    "decompress",
+    "help",
+    "no-keep",
+    "verbose",
+    "version"
+};
+const vector<OptionChange> optionChanges = {
+    OptionChange(sessionSettings.useStdout, true),
+    OptionChange(sessionSettings.compress, false),
+    OptionChange(sessionSettings.showHelp, true),
+    OptionChange(sessionSettings.keepOriginalFile, false),
+    OptionChange(sessionSettings.verboseMode, true),
+    OptionChange(sessionSettings.showVersion, true)
 };
 
 GlobalSettings globalSettings;
@@ -76,21 +78,7 @@ SessionSettings::SessionSettings() :
     inFilePath(defaultInFilePath),
     outFilePath(defaultOutFilePath) {}
 
-Arg::Arg(char shortArg, const string &longArg) : shortArg(shortArg), longArg(longArg) {}
-
-Arg::Arg(char shortArg) : shortArg(shortArg), longArg("") {}
-
-Arg::Arg(const string &longArg) : shortArg('\0'), longArg(longArg) {}
-
 OptionChange::OptionChange(bool &target, bool targetStatus) : target(target), targetStatus(targetStatus) {}
-
-bool operator<(const Arg &lhs, const Arg &rhs) {
-    return lhs.shortArg < rhs.shortArg;
-}
-
-bool operator==(const Arg &lhs, const Arg &rhs) {
-    return lhs.shortArg == rhs.shortArg || lhs.longArg == rhs.longArg;
-}
 
 void parseArgs(int argc, char *argv[]) {
     string programName = argv[0];
@@ -117,14 +105,15 @@ void parseArgs(int argc, char *argv[]) {
                     sessionSettings.useStdin = false;
                     needFurtherPath = true;
                 } else {
-                    map<Arg, OptionChange>::const_iterator iter = argOptionMap.find(Arg(argv[i][j]));
-                    if (iter == argOptionMap.end()) {
+                    vector<char>::const_iterator iter = find(shortArgs.begin(), shortArgs.end(), argv[i][j]);
+                    if (iter == shortArgs.end()) {
                         ostringstream errMsg;
                         errMsg << "unrecognized option -" << argv[i][j];
                         sendMessage(MSG_ERROR, errMsg.str());
                         throw runtime_error(errMsg.str());
                     } else {
-                        iter->second.target = iter->second.targetStatus;
+                        vector<OptionChange>::const_iterator optionChangeIter = optionChanges.begin() + (iter - shortArgs.begin());
+                        optionChangeIter->target = optionChangeIter->targetStatus;
                     }
                 }
             }
@@ -136,14 +125,15 @@ void parseArgs(int argc, char *argv[]) {
                 sessionSettings.useStdin = false;
                 needFurtherPath = true;
             } else {
-                map<Arg, OptionChange>::const_iterator iter = argOptionMap.find(Arg(option));
-                if (iter == argOptionMap.end()) {
+                vector<string>::const_iterator iter = find(longArgs.begin(), longArgs.end(), argv[i] + 2);
+                if (iter == longArgs.end()) {
                     ostringstream errMsg;
                     errMsg << "unrecognized option " << argv[i];
                     sendMessage(MSG_ERROR, errMsg.str());
                     throw runtime_error(errMsg.str());
                 } else {
-                    iter->second.target = iter->second.targetStatus;
+                    vector<OptionChange>::const_iterator optionChangeIter = optionChanges.begin() + (iter - longArgs.begin());
+                    optionChangeIter->target = optionChangeIter->targetStatus;
                 }
             }
         }
