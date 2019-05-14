@@ -5,9 +5,25 @@
 
 #include <string>
 #include <algorithm>
+#include <map>
 
 using std::string;
 using std::copy;
+using std::map;
+
+struct Arg {
+    char shortArg;
+    string longArg;
+    Arg(char shortArg, const string &longArg);
+    Arg(char shortArg);
+    Arg(const string &longArg);
+};
+
+struct OptionChange {
+    bool &target;
+    bool targetStatus;
+    OptionChange(bool &target, bool targetStatus);
+};
 
 const char defaultCompressorIdentifier[GlobalSettings::COMPRESSOR_IDENTIFIER_SIZE] = {'H', 'U', 'F', 'M', 'A', 'N', 'Z'};
 const unsigned defaultCompressorVersion = 0U;
