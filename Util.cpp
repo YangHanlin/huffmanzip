@@ -34,7 +34,14 @@ void showHelp() {
     cout << "Usage: " << sessionSettings.programName << " [OPTION]... [FILE}..." << endl
          << "Compress/decompress single files using Huffman coding." << endl
          << endl
-         << "(N/A yet)" << endl;
+         << "-c, --stdout     write on standard output" << endl
+         << "-d, --decompress decompress (implied when input filename ends with .huffmanzip)" << endl
+         << "-h, --help       display help information and exit" << endl
+         << "-k, --no-keep    do not keep (delete) the original file" << endl
+         << "-v, --verbose    verbose mode (display more information)" << endl
+         << "-V, --version    display version information and exit" << endl
+         << endl
+         << "With no FILE given, or when FILE is -, read standard input." << endl;
 }
 
 void showVersion() {

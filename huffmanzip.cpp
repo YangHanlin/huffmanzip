@@ -3,11 +3,11 @@
 #include "Settings.h"
 #include "Util.h"
 
-#include <iostream>
+// #include <iostream>
 #include <stdexcept>
 
-using std::cerr;
-using std::endl;
+// using std::cerr;
+// using std::endl;
 using std::exception;
 
 int main(int argc, char *argv[]) {
@@ -33,8 +33,18 @@ int main(int argc, char *argv[]) {
     //      << "sessionSettings.outFilePath = \"" << sessionSettings.outFilePath << "\"" << endl;
     try {
         parseArgs(argc, argv);
+        if (sessionSettings.showHelp) {
+            showHelp();
+            return 0;
+        }
+        if (sessionSettings.showVersion) {
+            showVersion();
+            return 0;
+        }
+        sendMessage(MSG_WARNING, "the feature has not been implemented; please wait");
+        return 0;
     } catch (const exception &e) {
-        cerr << "Process terminated due to an error." << endl;
+        sendMessage(MSG_INFO, "program terminated due to an error");
     }
     // cout << "Parsed:" << endl
     //      << "globalSettings.compressorIdentifier = \"" << string(globalSettings.compressorIdentifier, globalSettings.compressorIdentifier + GlobalSettings::COMPRESSOR_IDENTIFIER_SIZE) << "\"" << endl
@@ -54,5 +64,4 @@ int main(int argc, char *argv[]) {
     // showHelp();
     // showVersion();
     // system("pause");
-    return 0;
 }
