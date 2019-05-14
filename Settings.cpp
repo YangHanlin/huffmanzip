@@ -119,8 +119,6 @@ void parseArgs(int argc, char *argv[]) {
             }
         } else {
             string option = argv[i] + 2;
-            // sendMessage(MSG_INFO, "<dbg> current option: " + option);
-            // sendMessage(MSG_INFO, "<dbg> current capsuled option: " + Arg(option).longArg);
             if (option == "output") {
                 sessionSettings.useStdin = false;
                 needFurtherPath = true;
