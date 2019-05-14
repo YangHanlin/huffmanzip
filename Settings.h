@@ -11,6 +11,7 @@ struct GlobalSettings {
     unsigned compressorVersion;
     std::string compressorVersionStr;
     unsigned fileSignature;
+    std::string fileSuffix;
     GlobalSettings();
 };
 

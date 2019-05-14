@@ -26,6 +26,7 @@ const char defaultCompressorIdentifier[GlobalSettings::COMPRESSOR_IDENTIFIER_SIZ
 const unsigned defaultCompressorVersion = 0U;
 const string defaultCompressorVersionStr = "0.0";
 const unsigned defaultFileSignature = 0xaabbccddU;
+const string defaultFileSuffix = ".huffmanzip";
 
 const string defaultProgramName = "huffmanzip";
 const bool defaultShowHelp = false;
@@ -62,7 +63,8 @@ SessionSettings sessionSettings;
 GlobalSettings::GlobalSettings() :
     compressorVersion(defaultCompressorVersion),
     compressorVersionStr(defaultCompressorVersionStr),
-    fileSignature(defaultFileSignature) {
+    fileSignature(defaultFileSignature),
+    fileSuffix(defaultFileSuffix) {
     copy(defaultCompressorIdentifier, defaultCompressorIdentifier + COMPRESSOR_IDENTIFIER_SIZE, compressorIdentifier);
 }
 
@@ -84,10 +86,13 @@ void parseArgs(int argc, char *argv[]) {
     string programName = argv[0];
     string::size_type pos = programName.find_last_of('/'),
                       backslashPos = programName.find_last_of('\\');
-    if (backslashPos != string::npos && pos < backslashPos)
+    if (pos == string::npos || (backslashPos != string::npos && pos < backslashPos))
         pos = backslashPos;
     if (pos != string::npos)
         programName = programName.substr(pos + 1);
+    string::size_type dotPos = programName.find_last_of('.');
+    if (dotPos != string::npos)
+        programName = programName.substr(0, dotPos);
     if (!programName.empty())
         sessionSettings.programName = programName;
     bool needFurtherPath = false;
@@ -97,12 +102,13 @@ void parseArgs(int argc, char *argv[]) {
                 sessionSettings.outFilePath = argv[i];
                 needFurtherPath = false;
             } else {
+                sessionSettings.useStdin = false;
                 sessionSettings.inFilePath = argv[i];
             }
         } else if (argv[i][1] != '-') {
             for (int j = 1; argv[i][j] != '\0'; ++j) {
                 if (argv[i][j] == 'o') {
-                    sessionSettings.useStdin = false;
+                    sessionSettings.useStdout = false;
                     needFurtherPath = true;
                 } else {
                     vector<char>::const_iterator iter = find(shortArgs.begin(), shortArgs.end(), argv[i][j]);
@@ -120,7 +126,7 @@ void parseArgs(int argc, char *argv[]) {
         } else {
             string option = argv[i] + 2;
             if (option == "output") {
-                sessionSettings.useStdin = false;
+                sessionSettings.useStdout = false;
                 needFurtherPath = true;
             } else {
                 vector<string>::const_iterator iter = find(longArgs.begin(), longArgs.end(), argv[i] + 2);
@@ -135,5 +141,25 @@ void parseArgs(int argc, char *argv[]) {
                 }
             }
         }
+    }
+    if (sessionSettings.showHelp || sessionSettings.showVersion)
+        return;
+    if (!sessionSettings.useStdin) {
+        string::size_type suffixPos = sessionSettings.inFilePath.rfind(globalSettings.fileSuffix);
+        bool endsWithSuffix;
+        if (suffixPos + globalSettings.fileSuffix.size() == sessionSettings.inFilePath.size()) {
+            endsWithSuffix = true;
+            sessionSettings.compress = false;
+        }
+        if (!sessionSettings.useStdout && sessionSettings.outFilePath.empty())
+            sessionSettings.outFilePath = sessionSettings.compress ? sessionSettings.inFilePath + globalSettings.fileSuffix : (endsWithSuffix ? sessionSettings.inFilePath.substr(0, suffixPos) : "");
+    }
+    if (!sessionSettings.useStdin && sessionSettings.inFilePath.empty()) {
+        sendMessage(MSG_ERROR, "missing input file");
+        throw runtime_error("missing input file");
+    }
+    if (!sessionSettings.useStdout && sessionSettings.outFilePath.empty()) {
+        sendMessage(MSG_ERROR, "missing output file");
+        throw runtime_error("missing output file");
     }
 }
