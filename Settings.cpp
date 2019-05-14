@@ -106,10 +106,10 @@ void parseArgs(int argc, char *argv[]) {
     for (int i = 1; i < argc; ++i) {
         if (argv[i][0] != '-') {
             if (needFurtherPath) {
-                sessionSettings.outFilePath = argv[i][0];
+                sessionSettings.outFilePath = argv[i];
                 needFurtherPath = false;
             } else {
-                sessionSettings.inFilePath = argv[i][0];
+                sessionSettings.inFilePath = argv[i];
             }
         } else if (argv[i][1] != '-') {
             for (int j = 1; argv[i][j] != '\0'; ++j) {
@@ -129,15 +129,22 @@ void parseArgs(int argc, char *argv[]) {
                 }
             }
         } else {
-            
-            map<Arg, OptionChange>::const_iterator iter = argOptionMap.find(Arg(argv[i] + 2));
-            if (iter == argOptionMap.end()) {
-                ostringstream errMsg;
-                errMsg << "unrecognized option " << argv[i];
-                sendMessage(MSG_ERROR, errMsg.str());
-                throw runtime_error(errMsg.str());
+            string option = argv[i] + 2;
+            // sendMessage(MSG_INFO, "<dbg> current option: " + option);
+            // sendMessage(MSG_INFO, "<dbg> current capsuled option: " + Arg(option).longArg);
+            if (option == "output") {
+                sessionSettings.useStdin = false;
+                needFurtherPath = true;
             } else {
-                iter->second.target = iter->second.targetStatus;
+                map<Arg, OptionChange>::const_iterator iter = argOptionMap.find(Arg(option));
+                if (iter == argOptionMap.end()) {
+                    ostringstream errMsg;
+                    errMsg << "unrecognized option " << argv[i];
+                    sendMessage(MSG_ERROR, errMsg.str());
+                    throw runtime_error(errMsg.str());
+                } else {
+                    iter->second.target = iter->second.targetStatus;
+                }
             }
         }
     }
