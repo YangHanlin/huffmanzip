@@ -31,7 +31,7 @@ void sendMessage(MessageType type, const string &msg) {
 }
 
 void showHelp() {
-    cout << "Usage: " << sessionSettings.programName << " [OPTION]... [FILE}..." << endl
+    cout << "Usage: " << sessionSettings.programName << " [OPTION]... [FILE]..." << endl
          << "Compress/decompress single files using Huffman coding." << endl
          << endl
          << "-c, --stdout     write on standard output" << endl
