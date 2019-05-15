@@ -16,13 +16,13 @@ using std::runtime_error;
 void sendMessage(MessageType type, const string &msg) {
     switch (type) {
         case MSG_INFO:
-            cout << sessionSettings.programName << ": info: " << msg << endl;
+            cout << sessionSettings.programName << ": info:    " << msg << endl;
             break;
         case MSG_WARNING:
             cerr << sessionSettings.programName << ": warning: " << msg << endl;
             break;
         case MSG_ERROR:
-            cerr << sessionSettings.programName << ": error: " << msg << endl;
+            cerr << sessionSettings.programName << ": error:   " << msg << endl;
             break;
         default:
             throw runtime_error("Invalid MessageType (enum) value in sendMessage()");
