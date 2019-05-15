@@ -34,12 +34,12 @@ void showHelp() {
     cout << "Usage: " << sessionSettings.programName << " [OPTION]... [FILE]..." << endl
          << "Compress/decompress single files using Huffman coding." << endl
          << endl
-         << "-c, --stdout     write on standard output" << endl
-         << "-d, --decompress decompress (implied when input filename ends with .huffmanzip)" << endl
-         << "-h, --help       display help information and exit" << endl
-         << "-k, --no-keep    do not keep (delete) the original file" << endl
-         << "-v, --verbose    verbose mode (display more information)" << endl
-         << "-V, --version    display version information and exit" << endl
+         << "  -c, --stdout     write on standard output" << endl
+         << "  -d, --decompress decompress (implied when input filename ends with " << globalSettings.fileSuffix << ")" << endl
+         << "  -h, --help       display help information and exit" << endl
+         << "  -k, --no-keep    do not keep (delete) the original file" << endl
+         << "  -v, --verbose    verbose mode (display more information)" << endl
+         << "  -V, --version    display version information and exit" << endl
          << endl
          << "Short options can be combined: -cdv = -c -d -v" << endl
          << endl
