@@ -115,7 +115,7 @@ void parseArgs(int argc, char *argv[]) {
                     if (iter == shortArgs.end()) {
                         ostringstream errMsg;
                         errMsg << "Unrecognized option -" << argv[i][j];
-                        sendMessage(MSG_ERROR, errMsg.str());
+                        sendMessage(MSG_ERROR, errMsg.str() + "; use -h/--help to get help");
                         throw runtime_error(errMsg.str());
                     } else {
                         vector<OptionChange>::const_iterator optionChangeIter = optionChanges.begin() + (iter - shortArgs.begin());
@@ -133,7 +133,7 @@ void parseArgs(int argc, char *argv[]) {
                 if (iter == longArgs.end()) {
                     ostringstream errMsg;
                     errMsg << "Unrecognized option " << argv[i];
-                    sendMessage(MSG_ERROR, errMsg.str());
+                    sendMessage(MSG_ERROR, errMsg.str() + "; use -h/--help to get help");
                     throw runtime_error(errMsg.str());
                 } else {
                     vector<OptionChange>::const_iterator optionChangeIter = optionChanges.begin() + (iter - longArgs.begin());
@@ -155,11 +155,11 @@ void parseArgs(int argc, char *argv[]) {
             sessionSettings.outFilePath = sessionSettings.compress ? sessionSettings.inFilePath + globalSettings.fileSuffix : (endsWithSuffix ? sessionSettings.inFilePath.substr(0, suffixPos) : "");
     }
     if (!sessionSettings.useStdin && sessionSettings.inFilePath.empty()) {
-        sendMessage(MSG_ERROR, "Missing input file");
+        sendMessage(MSG_ERROR, "Missing input file; use -h/--help to get help");
         throw runtime_error("Missing input file");
     }
     if (!sessionSettings.useStdout && sessionSettings.outFilePath.empty()) {
-        sendMessage(MSG_ERROR, "Missing output file");
+        sendMessage(MSG_ERROR, "Missing output file; use -h/--help to get help");
         throw runtime_error("Missing output file");
     }
 }
