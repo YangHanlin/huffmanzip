@@ -5,8 +5,16 @@
 #include "Util.h"
 
 #include <sstream>
+#include <iostream>
+#include <fstream>
+#include <stdexcept>
+#include <cstdio>
+#include <cstdlib>
 
 using std::ostringstream;
+using std::cin;
+using std::ofstream;
+using std::runtime_error;
 
 void compress() {
     if (sessionSettings.verboseMode) {
@@ -17,7 +25,26 @@ void compress() {
                 << (sessionSettings.useStdout ? "standard output" : sessionSettings.outFilePath);
         sendMessage(MSG_INFO, infoMsg.str());
     }
-    sendMessage(MSG_WARNING, "Compressing is not avalable for now");
+    if (sessionSettings.useStdin) {
+        sessionSettings.inFilePath = tmpnam(NULL) + sessionSettings.programName + ".tmp";
+        ofstream tmpFile(sessionSettings.inFilePath);
+        if (!tmpFile) {
+            ostringstream errMsg;
+            errMsg << "Unable to open temporary file " << sessionSettings.inFilePath;
+            sendMessage(MSG_ERROR, errMsg.str());
+            throw runtime_error(errMsg.str());
+        }
+        char tmp = '\0';
+        while (cin.get(tmp))
+            tmpFile << tmp;
+        tmpFile.close();
+    }
+    sendMessage(MSG_WARNING, "Compressing is not available for now");
+    if (sessionSettings.useStdin && remove(sessionSettings.inFilePath.c_str())) {
+        ostringstream warningMsg;
+        warningMsg << "Unable to delete temporary file " << sessionSettings.inFilePath << "; you may delete it manually";
+        sendMessage(MSG_WARNING, warningMsg.str());
+    }
 }
 
 void decompress() {
