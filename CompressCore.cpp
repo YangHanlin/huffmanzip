@@ -16,6 +16,8 @@
 
 using std::cin;
 using std::cout;
+using std::istream;
+using std::ostream;
 using std::ostringstream;
 using std::fstream;
 using std::string;
@@ -67,6 +69,13 @@ void TempFile::remove(const string &filePath) {
     }
 }
 
+ostream &copyStream(istream &is, ostream &os) {
+    char tmp;
+    while (is.get(tmp))
+        os << tmp;
+    return os;
+}
+
 void compressCore() {
     if (sessionSettings.verboseMode) {
         ostringstream infoMsg;
@@ -79,7 +88,7 @@ void compressCore() {
     if (sessionSettings.useStdin) {
         TempFile tmpFile(ios::out, false);
         sessionSettings.inFilePath = tmpFile.path();
-        copy(istream_iterator<char>(cin), istream_iterator<char>(), ostream_iterator<char>(tmpFile.stream()));
+        copyStream(cin, tmpFile.stream());
     }
     if (sessionSettings.compress) {
         sendMessage(MSG_WARNING, "Compressing is not available for now");
@@ -89,7 +98,7 @@ void compressCore() {
     if (sessionSettings.useStdout) {
         fstream tmpFile;
         TempFile::open(tmpFile, sessionSettings.outFilePath, ios::in);
-        copy(istream_iterator<char>(tmpFile), istream_iterator<char>(), ostream_iterator<char>(cout));
+        copyStream(tmpFile, cout);
     }
     if (sessionSettings.useStdin)
         TempFile::remove(sessionSettings.inFilePath);

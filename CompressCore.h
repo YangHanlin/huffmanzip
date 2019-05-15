@@ -5,6 +5,7 @@
 
 #include <string>
 #include <fstream>
+#include <iostream>
 
 class TempFile {
 public:
@@ -20,6 +21,8 @@ private:
     std::fstream fileStream;
     bool autoRemove;
 };
+
+std::ostream &copyStream(std::istream &is, std::ostream &os);
 
 void compressCore();
 
