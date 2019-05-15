@@ -20,7 +20,6 @@ int main(int argc, char *argv[]) {
             return 0;
         }
         compressCore();
-        // sendMessage(MSG_WARNING, "This feature has not been implemented yet; please wait");
         return 0;
     } catch (const exception &e) {
         sendMessage(MSG_INFO, "Program terminated due to an error");
