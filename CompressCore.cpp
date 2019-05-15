@@ -4,17 +4,68 @@
 #include "Settings.h"
 #include "Util.h"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 #include <fstream>
+#include <string>
+#include <algorithm>
+#include <iterator>
 #include <stdexcept>
 #include <cstdio>
 #include <cstdlib>
 
-using std::ostringstream;
 using std::cin;
-using std::ofstream;
+using std::cout;
+using std::ostringstream;
+using std::fstream;
+using std::string;
+using std::copy;
+using std::ios;
+using std::istream_iterator;
+using std::ostream_iterator;
 using std::runtime_error;
+
+TempFile::TempFile(ios::openmode openMode, bool autoRemove) :
+    filePath(tmpnam(NULL) + sessionSettings.programName + ".tmp"),
+    autoRemove(autoRemove) {
+    open(fileStream, filePath, openMode);
+}
+
+TempFile::~TempFile() {
+    fileStream.close();
+    if (autoRemove)
+        remove();
+}
+
+string TempFile::path() const {
+    return filePath;
+}
+
+fstream &TempFile::stream() {
+    return fileStream;
+}
+
+void TempFile::remove() const {
+    remove(filePath);
+}
+
+void TempFile::open(fstream &fileStream, const string &filePath, std::ios::openmode openMode) {
+    fileStream.open(filePath.c_str(), openMode);
+    if (!fileStream) {
+        ostringstream errMsg;
+        errMsg << "Unable to open temporary file " << filePath;
+        sendMessage(MSG_ERROR, errMsg.str());
+        throw runtime_error(errMsg.str());
+    }
+}
+
+void TempFile::remove(const string &filePath) {
+    if (::remove(filePath.c_str())) {
+        ostringstream errMsg;
+        errMsg << "Unable to delete temporary file " << filePath << "; you may delete it yourself";
+        sendMessage(MSG_ERROR, errMsg.str());
+    }
+}
 
 void compressCore() {
     if (sessionSettings.verboseMode) {
@@ -26,27 +77,22 @@ void compressCore() {
         sendMessage(MSG_INFO, infoMsg.str());
     }
     if (sessionSettings.useStdin) {
-        sessionSettings.inFilePath = tmpnam(NULL) + sessionSettings.programName + ".tmp";
-        ofstream tmpFile(sessionSettings.inFilePath);
-        if (!tmpFile) {
-            ostringstream errMsg;
-            errMsg << "Unable to open temporary file " << sessionSettings.inFilePath;
-            sendMessage(MSG_ERROR, errMsg.str());
-            throw runtime_error(errMsg.str());
-        }
-        char tmp = '\0';
-        while (cin.get(tmp))
-            tmpFile << tmp;
-        tmpFile.close();
+        TempFile tmpFile(ios::out, false);
+        sessionSettings.inFilePath = tmpFile.path();
+        copy(istream_iterator<char>(cin), istream_iterator<char>(), ostream_iterator<char>(tmpFile.stream()));
     }
     if (sessionSettings.compress) {
         sendMessage(MSG_WARNING, "Compressing is not available for now");
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
     }
-    if (sessionSettings.useStdin && remove(sessionSettings.inFilePath.c_str())) {
-        ostringstream warningMsg;
-        warningMsg << "Unable to delete temporary file " << sessionSettings.inFilePath << "; you may delete it yourself";
-        sendMessage(MSG_WARNING, warningMsg.str());
+    if (sessionSettings.useStdout) {
+        fstream tmpFile;
+        TempFile::open(tmpFile, sessionSettings.outFilePath, ios::in);
+        copy(istream_iterator<char>(tmpFile), istream_iterator<char>(), ostream_iterator<char>(cout));
     }
+    if (sessionSettings.useStdin)
+        TempFile::remove(sessionSettings.inFilePath);
+    if (sessionSettings.useStdout)
+        TempFile::remove(sessionSettings.outFilePath);
 }
