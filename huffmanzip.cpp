@@ -19,10 +19,7 @@ int main(int argc, char *argv[]) {
             showVersion();
             return 0;
         }
-        if (sessionSettings.compress)
-            compress();
-        else
-            decompress();
+        compressCore();
         // sendMessage(MSG_WARNING, "This feature has not been implemented yet; please wait");
         return 0;
     } catch (const exception &e) {

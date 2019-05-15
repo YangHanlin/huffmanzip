@@ -16,10 +16,10 @@ using std::cin;
 using std::ofstream;
 using std::runtime_error;
 
-void compress() {
+void compressCore() {
     if (sessionSettings.verboseMode) {
         ostringstream infoMsg;
-        infoMsg << "Compressing from "
+        infoMsg << (sessionSettings.compress ? "Compressing" : "Decompressing") << " from "
                 << (sessionSettings.useStdin ? "standard input" : sessionSettings.inFilePath)
                 << " to "
                 << (sessionSettings.useStdout ? "standard output" : sessionSettings.outFilePath);
@@ -39,22 +39,14 @@ void compress() {
             tmpFile << tmp;
         tmpFile.close();
     }
-    sendMessage(MSG_WARNING, "Compressing is not available for now");
+    if (compress) {
+        sendMessage(MSG_WARNING, "Compressing is not available for now");
+    } else {
+        sendMessage(MSG_WARNING, "Decompressing is not available for now");
+    }
     if (sessionSettings.useStdin && remove(sessionSettings.inFilePath.c_str())) {
         ostringstream warningMsg;
         warningMsg << "Unable to delete temporary file " << sessionSettings.inFilePath << "; you may delete it manually";
         sendMessage(MSG_WARNING, warningMsg.str());
     }
-}
-
-void decompress() {
-    if (sessionSettings.verboseMode) {
-        ostringstream infoMsg;
-        infoMsg << "Decompressing from "
-                << (sessionSettings.useStdin ? "standard input" : sessionSettings.inFilePath)
-                << " to "
-                << (sessionSettings.useStdout ? "standard output" : sessionSettings.outFilePath);
-        sendMessage(MSG_INFO, infoMsg.str());
-    }
-    sendMessage(MSG_WARNING, "Decompressing is not available for now");
 }
