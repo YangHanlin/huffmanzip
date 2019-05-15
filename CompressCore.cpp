@@ -39,7 +39,7 @@ void compressCore() {
             tmpFile << tmp;
         tmpFile.close();
     }
-    if (compress) {
+    if (sessionSettings.compress) {
         sendMessage(MSG_WARNING, "Compressing is not available for now");
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
