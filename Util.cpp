@@ -41,6 +41,8 @@ void showHelp() {
          << "-v, --verbose    verbose mode (display more information)" << endl
          << "-V, --version    display version information and exit" << endl
          << endl
+         << "Short options can be combined: -cdv = -c -d -v" << endl
+         << endl
          << "With no FILE given, or when FILE is -, read standard input." << endl;
 }
 
