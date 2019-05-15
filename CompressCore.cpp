@@ -46,7 +46,7 @@ void compressCore() {
     }
     if (sessionSettings.useStdin && remove(sessionSettings.inFilePath.c_str())) {
         ostringstream warningMsg;
-        warningMsg << "Unable to delete temporary file " << sessionSettings.inFilePath << "; you may delete it manually";
+        warningMsg << "Unable to delete temporary file " << sessionSettings.inFilePath << "; you may yourself";
         sendMessage(MSG_WARNING, warningMsg.str());
     }
 }
