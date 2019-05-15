@@ -2,6 +2,7 @@
 
 #include "Settings.h"
 #include "Util.h"
+#include "CompressCore.h"
 
 #include <stdexcept>
 
@@ -18,7 +19,11 @@ int main(int argc, char *argv[]) {
             showVersion();
             return 0;
         }
-        sendMessage(MSG_INFO, "This feature has not been implemented yet; please wait");
+        if (sessionSettings.compress)
+            compress();
+        else
+            decompress();
+        // sendMessage(MSG_WARNING, "This feature has not been implemented yet; please wait");
         return 0;
     } catch (const exception &e) {
         sendMessage(MSG_INFO, "Program terminated due to an error");
