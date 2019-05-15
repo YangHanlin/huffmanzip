@@ -114,7 +114,7 @@ void parseArgs(int argc, char *argv[]) {
                     vector<char>::const_iterator iter = find(shortArgs.begin(), shortArgs.end(), argv[i][j]);
                     if (iter == shortArgs.end()) {
                         ostringstream errMsg;
-                        errMsg << "unrecognized option -" << argv[i][j];
+                        errMsg << "Unrecognized option -" << argv[i][j];
                         sendMessage(MSG_ERROR, errMsg.str());
                         throw runtime_error(errMsg.str());
                     } else {
@@ -132,7 +132,7 @@ void parseArgs(int argc, char *argv[]) {
                 vector<string>::const_iterator iter = find(longArgs.begin(), longArgs.end(), argv[i] + 2);
                 if (iter == longArgs.end()) {
                     ostringstream errMsg;
-                    errMsg << "unrecognized option " << argv[i];
+                    errMsg << "Unrecognized option " << argv[i];
                     sendMessage(MSG_ERROR, errMsg.str());
                     throw runtime_error(errMsg.str());
                 } else {
@@ -155,11 +155,11 @@ void parseArgs(int argc, char *argv[]) {
             sessionSettings.outFilePath = sessionSettings.compress ? sessionSettings.inFilePath + globalSettings.fileSuffix : (endsWithSuffix ? sessionSettings.inFilePath.substr(0, suffixPos) : "");
     }
     if (!sessionSettings.useStdin && sessionSettings.inFilePath.empty()) {
-        sendMessage(MSG_ERROR, "missing input file");
-        throw runtime_error("missing input file");
+        sendMessage(MSG_ERROR, "Missing input file");
+        throw runtime_error("Missing input file");
     }
     if (!sessionSettings.useStdout && sessionSettings.outFilePath.empty()) {
-        sendMessage(MSG_ERROR, "missing output file");
-        throw runtime_error("missing output file");
+        sendMessage(MSG_ERROR, "Missing output file");
+        throw runtime_error("Missing output file");
     }
 }
