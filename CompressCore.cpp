@@ -72,7 +72,7 @@ void TempFile::remove(const string &filePath) {
 }
 
 ostream &copyStream(istream &is, ostream &os) {
-    char tmp;
+    char tmp = '\0';
     while (is.get(tmp))
         os << tmp;
     return os;
