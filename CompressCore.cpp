@@ -27,6 +27,8 @@ using std::istream_iterator;
 using std::ostream_iterator;
 using std::runtime_error;
 
+void test();
+
 TempFile::TempFile(ios::openmode openMode, bool autoRemove) :
     filePath(tmpnam(NULL) + sessionSettings.programName + ".tmp"),
     autoRemove(autoRemove) {
@@ -90,18 +92,43 @@ void compressCore() {
         sessionSettings.inFilePath = tmpFile.path();
         copyStream(cin, tmpFile.stream());
     }
+    TempFile *tmpOutFile = NULL;
+    if (sessionSettings.useStdout) {
+        tmpOutFile = new TempFile(ios::out);
+        sessionSettings.outFilePath = tmpOutFile->path();
+    }
     if (sessionSettings.compress) {
-        sendMessage(MSG_WARNING, "Compressing is not available for now");
+        sendMessage(MSG_WARNING, "Compressing is not available for now; the following is a test");
+        test();
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
     }
     if (sessionSettings.useStdout) {
-        fstream tmpFile;
-        TempFile::open(tmpFile, sessionSettings.outFilePath, ios::in);
-        copyStream(tmpFile, cout);
+        fstream tmpFileStream;
+        TempFile::open(tmpFileStream, sessionSettings.outFilePath, ios::in);
+        copyStream(tmpFileStream, cout);
     }
     if (sessionSettings.useStdin)
         TempFile::remove(sessionSettings.inFilePath);
-    if (sessionSettings.useStdout)
-        TempFile::remove(sessionSettings.outFilePath);
+    if (sessionSettings.useStdout) {
+        delete tmpOutFile;
+        tmpOutFile = NULL;
+    }
+}
+
+void test() {
+    fstream fin(sessionSettings.inFilePath.c_str(), ios::in|ios::binary), fout(sessionSettings.outFilePath.c_str(), ios::out|ios::binary);
+        if (!fin) {
+            ostringstream errMsg;
+            errMsg << "Unable to open input file " << sessionSettings.inFilePath;
+            sendMessage(MSG_ERROR, errMsg.str());
+            throw runtime_error(errMsg.str());
+        }
+        if (!fout) {
+            ostringstream errMsg;
+            errMsg << "Unable to open output file " << sessionSettings.outFilePath;
+            sendMessage(MSG_ERROR, errMsg.str());
+            throw runtime_error(errMsg.str());
+        }
+        copyStream(fin, fout);
 }

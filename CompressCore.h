@@ -14,7 +14,7 @@ public:
     std::string path() const;
     std::fstream &stream();
     void remove() const;
-    static void open(fstream &fileStream, const string &filePath, std::ios::openmode openMode);
+    static void open(std::fstream &fileStream, const std::string &filePath, std::ios::openmode openMode);
     static void remove(const std::string &filePath);
 private:
     std::string filePath;
