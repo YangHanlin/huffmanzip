@@ -27,7 +27,12 @@ using std::istream_iterator;
 using std::ostream_iterator;
 using std::runtime_error;
 
+#include <iomanip>
+using std::setbase;
+const size_t BYTE_SIZE = 256;
+
 void test();
+ostream &print(ostream &os, const unsigned int *arr);
 
 TempFile::TempFile(ios::openmode openMode, bool autoRemove) :
     filePath(tmpnam(NULL) + sessionSettings.programName + ".tmp"),
@@ -98,8 +103,18 @@ void compressCore() {
         sessionSettings.outFilePath = tmpOutFile->path();
     }
     if (sessionSettings.compress) {
-        sendMessage(MSG_WARNING, "Compressing is not available for now; the following is a test");
-        test();
+        fstream inFileStream(sessionSettings.inFilePath.c_str(), ios::in | ios::binary);
+        if (!inFileStream) {
+            ostringstream errMsg;
+            errMsg << "Unable to open " << (sessionSettings.useStdin ? "temporary file" : "input") << sessionSettings.inFilePath;
+            sendMessage(MSG_ERROR, errMsg.str());
+            throw runtime_error(errMsg.str());
+        }
+        unsigned byteFrequencies[BYTE_SIZE] = {0U};
+        unsigned char tmp = '\0';
+        while (inFileStream.read(reinterpret_cast<char*>(&tmp), sizeof(tmp)))
+            ++byteFrequencies[tmp];
+        print(cout, byteFrequencies);
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
     }
@@ -131,4 +146,13 @@ void test() {
             throw runtime_error(errMsg.str());
         }
         copyStream(fin, fout);
+}
+
+ostream &print(ostream &os, const unsigned int *arr) {
+    for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
+        if (arr[i] != 0U)
+            os << setbase(16) << (int)i << "("
+               << setbase(10) << i << "): "
+               << arr[i] << "\n";
+    return os;
 }
