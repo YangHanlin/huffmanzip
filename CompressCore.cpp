@@ -117,7 +117,7 @@ void compressCore() {
 }
 
 void test() {
-    fstream fin(sessionSettings.inFilePath.c_str(), ios::in|ios::binary), fout(sessionSettings.outFilePath.c_str(), ios::out|ios::binary);
+    fstream fin(sessionSettings.inFilePath.c_str(), ios::in | ios::binary), fout(sessionSettings.outFilePath.c_str(), ios::out | ios::binary);
         if (!fin) {
             ostringstream errMsg;
             errMsg << "Unable to open input file " << sessionSettings.inFilePath;
