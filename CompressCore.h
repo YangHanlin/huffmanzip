@@ -3,6 +3,8 @@
 #ifndef COMPRESS_CORE
 #define COMRPESS_CORE
 
+#include "BinaryTree.h"
+
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -20,6 +22,17 @@ private:
     std::string filePath;
     std::fstream fileStream;
     bool autoRemove;
+};
+
+struct HuffmanNode {
+    unsigned char byte;
+    unsigned weight;
+    HuffmanNode(unsigned char byte = '\0', unsigned weight = 0U);
+};
+
+class HuffmanNodeCompare {
+public:
+    bool operator()(const BinaryTree<HuffmanNode> &lhs, const BinaryTree<HuffmanNode> &rhs) const;
 };
 
 std::ostream &copyStream(std::istream &is, std::ostream &os);

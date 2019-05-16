@@ -3,11 +3,13 @@
 #include "CompressCore.h"
 #include "Settings.h"
 #include "Util.h"
+#include "BinaryTree.h"
 
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <queue>
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
@@ -21,6 +23,7 @@ using std::ostream;
 using std::ostringstream;
 using std::fstream;
 using std::string;
+using std::priority_queue;
 using std::copy;
 using std::ios;
 using std::istream_iterator;
@@ -76,6 +79,12 @@ void TempFile::remove(const string &filePath) {
     }
 }
 
+HuffmanNode::HuffmanNode(unsigned char byte, unsigned weight) : byte(byte), weight(weight) {}
+
+bool HuffmanNodeCompare::operator()(const BinaryTree<HuffmanNode> &lhs, const BinaryTree<HuffmanNode> &rhs) const {
+    return lhs.root()->weight < rhs.root()->weight;
+}
+
 ostream &copyStream(istream &is, ostream &os) {
     char tmp = '\0';
     while (is.get(tmp))
@@ -115,6 +124,7 @@ void compressCore() {
         while (inFileStream.read(reinterpret_cast<char*>(&tmp), sizeof(tmp)))
             ++byteFrequencies[tmp];
         print(cout, byteFrequencies);
+        // ...
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
     }
