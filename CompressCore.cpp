@@ -115,7 +115,7 @@ void compressCore() {
         fstream inFileStream(sessionSettings.inFilePath.c_str(), ios::in | ios::binary);
         if (!inFileStream) {
             ostringstream errMsg;
-            errMsg << "Unable to open " << (sessionSettings.useStdin ? "temporary file" : "input") << sessionSettings.inFilePath;
+            errMsg << "Unable to open " << (sessionSettings.useStdin ? "temporary file" : "input") << " " << sessionSettings.inFilePath;
             sendMessage(MSG_ERROR, errMsg.str());
             throw runtime_error(errMsg.str());
         }
