@@ -10,6 +10,7 @@
 #include <fstream>
 #include <string>
 #include <queue>
+#include <vector>
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
@@ -24,6 +25,7 @@ using std::ostringstream;
 using std::fstream;
 using std::string;
 using std::priority_queue;
+using std::vector;
 using std::copy;
 using std::ios;
 using std::istream_iterator;
@@ -36,6 +38,8 @@ const size_t BYTE_SIZE = 256;
 
 void test();
 ostream &print(ostream &os, const unsigned int *arr);
+void genHuffmanCode(const BinaryTree<HuffmanNode> &tree, string *arr);
+void genHuffmanCode(const BinaryTree<HuffmanNode>::ConstIterator &it, string *arr, const string &currentPath);
 
 TempFile::TempFile(ios::openmode openMode, bool autoRemove) :
     filePath(tmpnam(NULL) + sessionSettings.programName + ".tmp"),
@@ -82,7 +86,7 @@ void TempFile::remove(const string &filePath) {
 HuffmanNode::HuffmanNode(unsigned char byte, unsigned weight) : byte(byte), weight(weight) {}
 
 bool HuffmanNodeCompare::operator()(const BinaryTree<HuffmanNode> &lhs, const BinaryTree<HuffmanNode> &rhs) const {
-    return lhs.root()->weight < rhs.root()->weight;
+    return lhs.root()->weight > rhs.root()->weight;
 }
 
 ostream &copyStream(istream &is, ostream &os) {
@@ -124,7 +128,30 @@ void compressCore() {
         while (inFileStream.read(reinterpret_cast<char*>(&tmp), sizeof(tmp)))
             ++byteFrequencies[tmp];
         print(cout, byteFrequencies);
-        // ...
+        priority_queue<BinaryTree<HuffmanNode>, vector<BinaryTree<HuffmanNode>>, HuffmanNodeCompare> nodeQueue;
+        for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
+            if (byteFrequencies[i] > 0)
+                nodeQueue.push(HuffmanNode(i, byteFrequencies[i]));
+        while (nodeQueue.size() > 1) {
+            BinaryTree<HuffmanNode> tree1 = nodeQueue.top();
+            nodeQueue.pop();
+            BinaryTree<HuffmanNode> tree2 = nodeQueue.top();
+            nodeQueue.pop();
+            BinaryTree<HuffmanNode> treeCombined = HuffmanNode('\0', tree2.root()->weight + tree2.root()->weight);
+            cout << tree1.root()->weight << " + " << tree2.root()->weight << " = " << treeCombined.root()->weight << "\n";
+            treeCombined.move(treeCombined.root().lchild(), tree1.root());
+            treeCombined.move(treeCombined.root().rchild(), tree2.root());
+        }
+        cout << "Huffman tree has been constructed\n"; // Fucks
+        string codes[BYTE_SIZE];
+        BinaryTree<HuffmanNode> huffmanTree = nodeQueue.top();
+        // nodeQueue.pop();
+        genHuffmanCode(huffmanTree, codes);
+        for (size_t i = 0ULL; i < BYTE_SIZE; ++i) // FIXME: FUCKKK
+            // if (!codes[i].empty())
+                cout << setbase(16) << i << " ("
+                     << setbase(10) << i << "): "
+                     << "\"" << codes[i] << "\"\n";
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
     }
@@ -165,4 +192,18 @@ ostream &print(ostream &os, const unsigned int *arr) {
                << setbase(10) << i << "): "
                << arr[i] << "\n";
     return os;
+}
+
+void genHuffmanCode(const BinaryTree<HuffmanNode> &tree, string *arr) {
+    genHuffmanCode(tree.root(), arr, "");
+}
+
+void genHuffmanCode(const BinaryTree<HuffmanNode>::ConstIterator &it, string *arr, const string &currentPath) {
+    cout << "For " << currentPath << "\n";
+    if (it.null())
+        return;
+    if (it.lchild().null() && it.rchild().null())
+        arr[it->byte] = currentPath;
+    genHuffmanCode(it.lchild(), arr, currentPath + "0");
+    genHuffmanCode(it.rchild(), arr, currentPath + "1");
 }
