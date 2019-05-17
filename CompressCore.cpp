@@ -127,7 +127,7 @@ void compressCore() {
         unsigned char tmp = '\0';
         while (inFileStream.read(reinterpret_cast<char*>(&tmp), sizeof(tmp)))
             ++byteFrequencies[tmp];
-        print(cout, byteFrequencies);
+        // print(cout, byteFrequencies);
         priority_queue<BinaryTree<HuffmanNode>*, vector<BinaryTree<HuffmanNode>*>, HuffmanNodeCompare> nodeQueue;
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
             if (byteFrequencies[i] > 0)
@@ -143,16 +143,16 @@ void compressCore() {
             treeCombined->move(treeCombined->root().rchild(), tree2->root());
             nodeQueue.push(treeCombined);
         }
-        cout << "Huffman tree has been constructed\n"; // Fucks
+        // cout << "Huffman tree has been constructed\n"; // Fucks
         string codes[BYTE_SIZE];
         BinaryTree<HuffmanNode> *huffmanTree = nodeQueue.top();
         nodeQueue.pop();
         genHuffmanCode(*huffmanTree, codes);
-        for (size_t i = 0ULL; i < BYTE_SIZE; ++i) // FIXME: FUCKKK
-            if (!codes[i].empty())
-                cout << setbase(16) << i << " ("
-                     << setbase(10) << i << "): "
-                     << "\"" << codes[i] << "\"\n";
+        // for (size_t i = 0ULL; i < BYTE_SIZE; ++i) // FIXME: FUCKKK
+        //     if (!codes[i].empty())
+        //         cout << setbase(16) << i << " ("
+        //              << setbase(10) << i << "): "
+        //              << "\"" << codes[i] << "\"\n";
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
     }
