@@ -32,7 +32,7 @@ struct HuffmanNode {
 
 class HuffmanNodeCompare {
 public:
-    bool operator()(const BinaryTree<HuffmanNode> &lhs, const BinaryTree<HuffmanNode> &rhs) const;
+    bool operator()(const BinaryTree<HuffmanNode> *lhs, const BinaryTree<HuffmanNode> *rhs) const;
 };
 
 std::ostream &copyStream(std::istream &is, std::ostream &os);
