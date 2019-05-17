@@ -37,9 +37,9 @@ using std::setbase;
 const size_t BYTE_SIZE = 256;
 
 void test();
-ostream &print(ostream &os, const unsigned int *arr);
-void genHuffmanCode(const BinaryTree<HuffmanNode> &tree, string *arr);
-void genHuffmanCode(const BinaryTree<HuffmanNode>::ConstIterator &it, string *arr, const string &currentPath);
+ostream &print(ostream &os, const unsigned *arr);
+void genHuffmanCode(const BinaryTree<HuffmanNode> *tree, unsigned *arr);
+void genHuffmanCode(const BinaryTree<HuffmanNode>::ConstIterator &iter, unsigned *arr, unsigned code);
 
 TempFile::TempFile(ios::openmode openMode, bool autoRemove) :
     filePath(tmpnam(NULL) + sessionSettings.programName + ".tmp"),
@@ -127,7 +127,7 @@ void compressCore() {
         unsigned char tmp = '\0';
         while (inFileStream.read(reinterpret_cast<char*>(&tmp), sizeof(tmp)))
             ++byteFrequencies[tmp];
-        // print(cout, byteFrequencies);
+        print(cout, byteFrequencies);
         priority_queue<BinaryTree<HuffmanNode>*, vector<BinaryTree<HuffmanNode>*>, HuffmanNodeCompare> nodeQueue;
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
             if (byteFrequencies[i] > 0)
@@ -138,16 +138,19 @@ void compressCore() {
             BinaryTree<HuffmanNode> *tree2 = nodeQueue.top();
             nodeQueue.pop();
             BinaryTree<HuffmanNode> *treeCombined = new BinaryTree(HuffmanNode('\0', tree1->root()->weight + tree2->root()->weight));
-            cout << tree1->root()->weight << " + " << tree2->root()->weight << " = " << treeCombined->root()->weight << "\n";
+            // cout << tree1->root()->weight << " + " << tree2->root()->weight << " = " << treeCombined->root()->weight << "\n";
             treeCombined->move(treeCombined->root().lchild(), tree1->root());
             treeCombined->move(treeCombined->root().rchild(), tree2->root());
             nodeQueue.push(treeCombined);
         }
         // cout << "Huffman tree has been constructed\n"; // Fucks
-        string codes[BYTE_SIZE];
         BinaryTree<HuffmanNode> *huffmanTree = nodeQueue.top();
         nodeQueue.pop();
-        genHuffmanCode(*huffmanTree, codes);
+        unsigned huffmanCodes[BYTE_SIZE] = {0U};
+        genHuffmanCode(huffmanTree, huffmanCodes);
+        for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
+            if (huffmanCodes[i] > 0)
+                cout << i << ": " << huffmanCodes[i] << "\n";
         // for (size_t i = 0ULL; i < BYTE_SIZE; ++i) // FIXME: FUCKKK
         //     if (!codes[i].empty())
         //         cout << setbase(16) << i << " ("
@@ -186,7 +189,7 @@ void test() {
         copyStream(fin, fout);
 }
 
-ostream &print(ostream &os, const unsigned int *arr) {
+ostream &print(ostream &os, const unsigned *arr) {
     for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
         if (arr[i] != 0U)
             os << setbase(16) << (int)i << "("
@@ -195,15 +198,15 @@ ostream &print(ostream &os, const unsigned int *arr) {
     return os;
 }
 
-void genHuffmanCode(const BinaryTree<HuffmanNode> &tree, string *arr) {
-    genHuffmanCode(tree.root(), arr, "");
+void genHuffmanCode(const BinaryTree<HuffmanNode> *tree, unsigned *arr) {
+    genHuffmanCode(tree->root(), arr, 1U);
 }
 
-void genHuffmanCode(const BinaryTree<HuffmanNode>::ConstIterator &it, string *arr, const string &currentPath) {
-    if (it.null())
+void genHuffmanCode(const BinaryTree<HuffmanNode>::ConstIterator &iter, unsigned *arr, unsigned code) {
+    if (iter.null())
         return;
-    if (it.lchild().null() && it.rchild().null())
-        arr[it->byte] = currentPath;
-    genHuffmanCode(it.lchild(), arr, currentPath + "0");
-    genHuffmanCode(it.rchild(), arr, currentPath + "1");
+    if (iter.lchild().null() && iter.rchild().null())
+        arr[iter->byte] = code;
+    genHuffmanCode(iter.lchild(), arr, code << 1);
+    genHuffmanCode(iter.rchild(), arr, (code << 1) + 1);
 }
