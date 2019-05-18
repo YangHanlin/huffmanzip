@@ -212,7 +212,12 @@ void compressCore() {
             --compressedSize;
         }
         ++compressedSize;
-        // ..
+        int huffmanTableSizeOffset = sizeof(globalSettings.fileSignature) + sizeof(globalSettings.compressorIdentifier) + sizeof(globalSettings.compressorVersion),
+            compressedSizeOffset = huffmanTableSizeOffset + sizeof(ullPlaceHolder),
+            lastByteMaskOffset = compressedSizeOffset + sizeof(ullPlaceHolder);
+        outFileStream.seekp(huffmanTableSizeOffset, ios::beg).write(reinterpret_cast<char*>(&huffmanTableSize), sizeof(huffmanTableSize));
+        outFileStream.seekp(compressedSizeOffset, ios::beg).write(reinterpret_cast<char*>(&compressedSize), sizeof(compressedSize));
+        outFileStream.seekp(lastByteMaskOffset, ios::beg).write(reinterpret_cast<char*>(&currentMask), sizeof(currentMask));
         outFileStream.close();
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
