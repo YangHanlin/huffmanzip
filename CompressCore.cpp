@@ -155,6 +155,17 @@ void compressCore() {
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
             if (huffmanCodes[i] > 0)
                 cout << i << ": " << toBinary(huffmanCodes[i]) << "\n";
+        if (!sessionSettings.useStdout) {
+            fstream testOutFileStream(sessionSettings.outFilePath.c_str(), ios::in | ios::binary);
+            if (testOutFileStream) {
+                ostringstream warningMsg;
+                warningMsg << "The output file " << sessionSettings.outFilePath << " already exists";
+                sendMessage(MSG_WARNING, warningMsg.str());
+                sendMessage(MSG_WARNING, "The content of output file will be cleared");
+                testOutFileStream.close();
+            }
+        }
+        // ...
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
     }
