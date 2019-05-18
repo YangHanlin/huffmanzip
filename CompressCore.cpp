@@ -197,19 +197,19 @@ void compressCore() {
 
 void test() {
     fstream fin(sessionSettings.inFilePath.c_str(), ios::in | ios::binary), fout(sessionSettings.outFilePath.c_str(), ios::out | ios::binary);
-        if (!fin) {
-            ostringstream errMsg;
-            errMsg << "Unable to open input file " << sessionSettings.inFilePath;
-            sendMessage(MSG_ERROR, errMsg.str());
-            throw runtime_error(errMsg.str());
-        }
-        if (!fout) {
-            ostringstream errMsg;
-            errMsg << "Unable to open output file " << sessionSettings.outFilePath;
-            sendMessage(MSG_ERROR, errMsg.str());
-            throw runtime_error(errMsg.str());
-        }
-        copyStream(fin, fout);
+    if (!fin) {
+        ostringstream errMsg;
+        errMsg << "Unable to open input file " << sessionSettings.inFilePath;
+        sendMessage(MSG_ERROR, errMsg.str());
+        throw runtime_error(errMsg.str());
+    }
+    if (!fout) {
+        ostringstream errMsg;
+        errMsg << "Unable to open output file " << sessionSettings.outFilePath;
+        sendMessage(MSG_ERROR, errMsg.str());
+        throw runtime_error(errMsg.str());
+    }
+    copyStream(fin, fout);
 }
 
 ostream &print(ostream &os, const unsigned *arr) {
