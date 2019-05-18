@@ -222,7 +222,7 @@ ostream &print(ostream &os, const unsigned *arr) {
 }
 
 string toBinary(unsigned num) {
-    if (num == 1)
+    if (num == 0U)
         return "";
     return toBinary(num / 2U) + (num % 2U ? "1" : "0");
 }
