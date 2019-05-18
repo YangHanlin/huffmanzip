@@ -38,6 +38,7 @@ const size_t BYTE_SIZE = 256;
 
 void test();
 ostream &print(ostream &os, const unsigned *arr);
+string toBinary(unsigned num);
 void genHuffmanCode(const BinaryTree<HuffmanNode> *tree, unsigned *arr);
 void genHuffmanCode(const BinaryTree<HuffmanNode>::ConstIterator &iter, unsigned *arr, unsigned code);
 
@@ -124,9 +125,12 @@ void compressCore() {
             throw runtime_error(errMsg.str());
         }
         unsigned byteFrequencies[BYTE_SIZE] = {0U};
+        unsigned originalSize = 0U;
         unsigned char tmp = '\0';
-        while (inFileStream.read(reinterpret_cast<char*>(&tmp), sizeof(tmp)))
+        while (inFileStream.read(reinterpret_cast<char*>(&tmp), sizeof(tmp))) {
             ++byteFrequencies[tmp];
+            ++originalSize;
+        }
         print(cout, byteFrequencies);
         priority_queue<BinaryTree<HuffmanNode>*, vector<BinaryTree<HuffmanNode>*>, HuffmanNodeCompare> nodeQueue;
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
@@ -150,12 +154,7 @@ void compressCore() {
         genHuffmanCode(huffmanTree, huffmanCodes);
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
             if (huffmanCodes[i] > 0)
-                cout << i << ": " << huffmanCodes[i] << "\n";
-        // for (size_t i = 0ULL; i < BYTE_SIZE; ++i) // FIXME: FUCKKK
-        //     if (!codes[i].empty())
-        //         cout << setbase(16) << i << " ("
-        //              << setbase(10) << i << "): "
-        //              << "\"" << codes[i] << "\"\n";
+                cout << i << ": " << toBinary(huffmanCodes[i]) << "\n";
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
     }
@@ -196,6 +195,12 @@ ostream &print(ostream &os, const unsigned *arr) {
                << setbase(10) << i << "): "
                << arr[i] << "\n";
     return os;
+}
+
+string toBinary(unsigned num) {
+    if (num == 1)
+        return "";
+    return toBinary(num / 2U) + (num % 2U ? "1" : "0");
 }
 
 void genHuffmanCode(const BinaryTree<HuffmanNode> *tree, unsigned *arr) {
