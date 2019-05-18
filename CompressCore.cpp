@@ -159,13 +159,17 @@ void compressCore() {
             fstream testOutFileStream(sessionSettings.outFilePath.c_str(), ios::in | ios::binary);
             if (testOutFileStream) {
                 ostringstream warningMsg;
-                warningMsg << "The output file " << sessionSettings.outFilePath << " already exists";
+                warningMsg << "The output file " << sessionSettings.outFilePath << " already exists; its content will be cleared";
                 sendMessage(MSG_WARNING, warningMsg.str());
-                sendMessage(MSG_WARNING, "The content of output file will be cleared");
                 testOutFileStream.close();
             }
         }
-        // ...
+        fstream outFileStream(sessionSettings.outFilePath.c_str(), ios::out | ios::binary);
+        if (!outFileStream) {
+            ostringstream errMsg;
+            errMsg << "Unable to open " << (sessionSettings.useStdout ? "temporary file" : "output") << " " << sessionSettings.outFilePath;
+            sendMessage(MSG_ERROR, errMsg.str());
+        }
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
     }
