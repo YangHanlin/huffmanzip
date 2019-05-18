@@ -169,7 +169,16 @@ void compressCore() {
             ostringstream errMsg;
             errMsg << "Unable to open " << (sessionSettings.useStdout ? "temporary file" : "output") << " " << sessionSettings.outFilePath;
             sendMessage(MSG_ERROR, errMsg.str());
+            throw runtime_error(errMsg.str());
         }
+        outFileStream.write(reinterpret_cast<char*>(&globalSettings.fileSignature), sizeof(globalSettings.fileSignature));
+        outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorIdentifier), sizeof(globalSettings.compressorIdentifier));
+        outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorVersion), sizeof(globalSettings.compressorVersion));
+        unsigned long long ui = 0U; unsigned char uc = '\0';
+        outFileStream.write(reinterpret_cast<char*>(&ui), sizeof(ui)); // FUck
+        outFileStream.write(reinterpret_cast<char*>(&ui), sizeof(ui)); // fuck
+        outFileStream.write(reinterpret_cast<char*>(&uc), sizeof(uc)); // fucks
+        outFileStream.close();
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
     }
