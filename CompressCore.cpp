@@ -175,10 +175,10 @@ void compressCore() {
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.fileSignature), sizeof(globalSettings.fileSignature));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorIdentifier), sizeof(globalSettings.compressorIdentifier));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorVersion), sizeof(globalSettings.compressorVersion));
-        unsigned long long ui = 0U; unsigned char uc = '\0';
-        outFileStream.write(reinterpret_cast<char*>(&ui), sizeof(ui)); // FUck
-        outFileStream.write(reinterpret_cast<char*>(&ui), sizeof(ui)); // fuck
-        outFileStream.write(reinterpret_cast<char*>(&uc), sizeof(uc)); // fucks
+        unsigned long long ullPlaceHolder = 0U; unsigned char ucPlaceHolder = '\0';
+        outFileStream.write(reinterpret_cast<char*>(&ullPlaceHolder), sizeof(ullPlaceHolder)); // FUck
+        outFileStream.write(reinterpret_cast<char*>(&ullPlaceHolder), sizeof(ullPlaceHolder)); // fuck
+        outFileStream.write(reinterpret_cast<char*>(&ucPlaceHolder), sizeof(ucPlaceHolder)); // fucks
         unsigned long long huffmanTableSize = 0ULL;
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
             if (huffmanCodes[i] != 0U) {
