@@ -79,3 +79,6 @@ Makefile
 
 # Test file
 *.test
+
+# Huffmanzip files
+*.Huffmanzip
