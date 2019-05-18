@@ -185,7 +185,7 @@ void compressCore() {
                 unsigned char ci = i;
                 outFileStream.write(reinterpret_cast<char*>(&ci), sizeof(ci));
                 outFileStream.write(reinterpret_cast<char*>(&huffmanCodes[i]), sizeof(huffmanCodes[i]));
-                ++huffmanTableSize;
+                huffmanTableSize += sizeof(ci) + sizeof(huffmanCodes[i]);
             }
         inFileStream.clear();
         inFileStream.seekg(ios::beg);
