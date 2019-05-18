@@ -153,7 +153,7 @@ void compressCore() {
         unsigned huffmanCodes[BYTE_SIZE] = {0U};
         genHuffmanCode(huffmanTree, huffmanCodes);
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
-            if (huffmanCodes[i] > 0)
+            if (huffmanCodes[i] != 0)
                 cout << i << ": " << toBinary(huffmanCodes[i]) << "\n";
         if (!sessionSettings.useStdout) {
             fstream testOutFileStream(sessionSettings.outFilePath.c_str(), ios::in | ios::binary);
