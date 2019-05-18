@@ -179,11 +179,13 @@ void compressCore() {
         outFileStream.write(reinterpret_cast<char*>(&ui), sizeof(ui)); // FUck
         outFileStream.write(reinterpret_cast<char*>(&ui), sizeof(ui)); // fuck
         outFileStream.write(reinterpret_cast<char*>(&uc), sizeof(uc)); // fucks
+        unsigned long long huffmanTableSize = 0ULL;
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
             if (huffmanCodes[i] != 0U) {
                 unsigned char ci = i;
                 outFileStream.write(reinterpret_cast<char*>(&ci), sizeof(ci));
                 outFileStream.write(reinterpret_cast<char*>(&huffmanCodes[i]), sizeof(huffmanCodes[i]));
+                ++huffmanTableSize;
             }
         inFileStream.clear();
         inFileStream.seekg(ios::beg);
@@ -200,9 +202,16 @@ void compressCore() {
                 if (currentMask == 0x7U) {
                     outFileStream.write(reinterpret_cast<char*>(&currentByte), sizeof(currentByte));
                     currentByte = 0U;
+                    currentMask = 0U;
+                    ++compressedSize;
                 }
             }
         }
+        if (currentMask == 0x0U) {
+            currentMask == 0xffU;
+            --compressedSize;
+        }
+        ++compressedSize;
         // ..
         outFileStream.close();
     } else {
