@@ -1,4 +1,5 @@
 // CompressCore.cpp
+// Note: >1 / != 1
 
 #include "CompressCore.h"
 #include "Settings.h"
@@ -153,7 +154,7 @@ void compressCore() {
         unsigned huffmanCodes[BYTE_SIZE] = {0U};
         genHuffmanCode(huffmanTree, huffmanCodes);
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
-            if (huffmanCodes[i] > 0)
+            if (huffmanCodes[i] != 0)
                 cout << i << ": " << toBinary(huffmanCodes[i]) << "\n";
         if (!sessionSettings.useStdout) {
             fstream testOutFileStream(sessionSettings.outFilePath.c_str(), ios::in | ios::binary);
@@ -174,10 +175,49 @@ void compressCore() {
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.fileSignature), sizeof(globalSettings.fileSignature));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorIdentifier), sizeof(globalSettings.compressorIdentifier));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorVersion), sizeof(globalSettings.compressorVersion));
-        unsigned long long ui = 0U; unsigned char uc = '\0';
-        outFileStream.write(reinterpret_cast<char*>(&ui), sizeof(ui)); // FUck
-        outFileStream.write(reinterpret_cast<char*>(&ui), sizeof(ui)); // fuck
-        outFileStream.write(reinterpret_cast<char*>(&uc), sizeof(uc)); // fucks
+        unsigned long long ullPlaceHolder = 0U; unsigned char ucPlaceHolder = '\0';
+        outFileStream.write(reinterpret_cast<char*>(&ullPlaceHolder), sizeof(ullPlaceHolder)); // FUck
+        outFileStream.write(reinterpret_cast<char*>(&ullPlaceHolder), sizeof(ullPlaceHolder)); // fuck
+        outFileStream.write(reinterpret_cast<char*>(&ucPlaceHolder), sizeof(ucPlaceHolder)); // fucks
+        unsigned long long huffmanTableSize = 0ULL;
+        for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
+            if (huffmanCodes[i] != 0U) {
+                unsigned char ci = i;
+                outFileStream.write(reinterpret_cast<char*>(&ci), sizeof(ci));
+                outFileStream.write(reinterpret_cast<char*>(&huffmanCodes[i]), sizeof(huffmanCodes[i]));
+                huffmanTableSize += sizeof(ci) + sizeof(huffmanCodes[i]);
+            }
+        inFileStream.clear();
+        inFileStream.seekg(ios::beg);
+        unsigned char outTmp = '\0';
+        unsigned long long compressedSize = 0ULL;
+        unsigned char currentByte = 0U, currentMask = 0U;
+        while (inFileStream.read(reinterpret_cast<char*>(&outTmp), sizeof(outTmp))) {
+            vector<bool> bits;
+            while (outTmp != 0U)
+                bits.push_back(outTmp & 0x1U);
+            for (vector<bool>::reverse_iterator iter = bits.rbegin(); iter != bits.rend() - 1; ++iter) {
+                currentByte = (currentByte << 1) + *iter;
+                currentMask = (currentMask << 1) + 1;
+                if (currentMask == 0x7U) {
+                    outFileStream.write(reinterpret_cast<char*>(&currentByte), sizeof(currentByte));
+                    currentByte = 0U;
+                    currentMask = 0U;
+                    ++compressedSize;
+                }
+            }
+        }
+        if (currentMask == 0x0U) {
+            currentMask == 0xffU;
+            --compressedSize;
+        }
+        ++compressedSize;
+        int huffmanTableSizeOffset = sizeof(globalSettings.fileSignature) + sizeof(globalSettings.compressorIdentifier) + sizeof(globalSettings.compressorVersion),
+            compressedSizeOffset = huffmanTableSizeOffset + sizeof(ullPlaceHolder),
+            lastByteMaskOffset = compressedSizeOffset + sizeof(ullPlaceHolder);
+        outFileStream.seekp(huffmanTableSizeOffset, ios::beg).write(reinterpret_cast<char*>(&huffmanTableSize), sizeof(huffmanTableSize));
+        outFileStream.seekp(compressedSizeOffset, ios::beg).write(reinterpret_cast<char*>(&compressedSize), sizeof(compressedSize));
+        outFileStream.seekp(lastByteMaskOffset, ios::beg).write(reinterpret_cast<char*>(&currentMask), sizeof(currentMask));
         outFileStream.close();
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
@@ -197,19 +237,19 @@ void compressCore() {
 
 void test() {
     fstream fin(sessionSettings.inFilePath.c_str(), ios::in | ios::binary), fout(sessionSettings.outFilePath.c_str(), ios::out | ios::binary);
-        if (!fin) {
-            ostringstream errMsg;
-            errMsg << "Unable to open input file " << sessionSettings.inFilePath;
-            sendMessage(MSG_ERROR, errMsg.str());
-            throw runtime_error(errMsg.str());
-        }
-        if (!fout) {
-            ostringstream errMsg;
-            errMsg << "Unable to open output file " << sessionSettings.outFilePath;
-            sendMessage(MSG_ERROR, errMsg.str());
-            throw runtime_error(errMsg.str());
-        }
-        copyStream(fin, fout);
+    if (!fin) {
+        ostringstream errMsg;
+        errMsg << "Unable to open input file " << sessionSettings.inFilePath;
+        sendMessage(MSG_ERROR, errMsg.str());
+        throw runtime_error(errMsg.str());
+    }
+    if (!fout) {
+        ostringstream errMsg;
+        errMsg << "Unable to open output file " << sessionSettings.outFilePath;
+        sendMessage(MSG_ERROR, errMsg.str());
+        throw runtime_error(errMsg.str());
+    }
+    copyStream(fin, fout);
 }
 
 ostream &print(ostream &os, const unsigned *arr) {
@@ -222,7 +262,7 @@ ostream &print(ostream &os, const unsigned *arr) {
 }
 
 string toBinary(unsigned num) {
-    if (num == 1)
+    if (num == 0U)
         return "";
     return toBinary(num / 2U) + (num % 2U ? "1" : "0");
 }
