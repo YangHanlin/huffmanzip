@@ -9,6 +9,14 @@
 using std::exception;
 
 int main(int argc, char *argv[]) {
+    // argc = 3;
+    // char *argvCandidate[] = {
+    //     "huffmanzip.exe",
+    //     "D:\\matto\\Documents\\Codes\\Homework\\ds-9p\\eng.easy.txt.test",
+    //     "-c",
+    //     // "D:\\matto\\Documents\\Codes\\Homework\\ds-9p\\eng.txt.test"
+    // };
+    // argv = argvCandidate;
     try {
         parseArgs(argc, argv);
         if (sessionSettings.showHelp) {
