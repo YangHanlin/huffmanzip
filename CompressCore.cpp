@@ -12,6 +12,7 @@
 #include <string>
 #include <queue>
 #include <vector>
+#include <map>
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
@@ -27,6 +28,7 @@ using std::fstream;
 using std::string;
 using std::priority_queue;
 using std::vector;
+using std::map;
 using std::copy;
 using std::ios;
 using std::istream_iterator;
@@ -124,6 +126,15 @@ void compressCore() {
         sendMessage(MSG_ERROR, errMsg.str());
         throw runtime_error(errMsg.str());
     }
+    if (!sessionSettings.useStdout) {
+        fstream testOutFileStream(sessionSettings.outFilePath.c_str(), ios::in | ios::binary);
+        if (testOutFileStream) {
+            ostringstream warningMsg;
+            warningMsg << "The output file " << sessionSettings.outFilePath << " already exists; its content will be cleared";
+            sendMessage(MSG_WARNING, warningMsg.str());
+            testOutFileStream.close();
+        }
+    }
     fstream outFileStream(sessionSettings.outFilePath.c_str(), ios::out | ios::binary);
     if (!outFileStream) {
         ostringstream errMsg;
@@ -156,22 +167,18 @@ void compressCore() {
             nodeQueue.push(treeCombined);
         }
         // cout << "Huffman tree has been constructed\n"; // Fucks
-        BinaryTree<HuffmanNode> *huffmanTree = nodeQueue.top();
-        nodeQueue.pop();
+        BinaryTree<HuffmanNode> *huffmanTree = NULL;
+        if (!nodeQueue.empty()) {
+            huffmanTree = nodeQueue.top();
+            nodeQueue.pop();
+        } else {
+            huffmanTree = new BinaryTree<HuffmanNode>;
+        }
         unsigned huffmanCodes[BYTE_SIZE] = {0U};
         genHuffmanCode(huffmanTree, huffmanCodes);
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
             if (huffmanCodes[i] != 0)
                 cout << i << ": " << toBinary(huffmanCodes[i]) << "\n";
-        if (!sessionSettings.useStdout) {
-            fstream testOutFileStream(sessionSettings.outFilePath.c_str(), ios::in | ios::binary);
-            if (testOutFileStream) {
-                ostringstream warningMsg;
-                warningMsg << "The output file " << sessionSettings.outFilePath << " already exists; its content will be cleared";
-                sendMessage(MSG_WARNING, warningMsg.str());
-                testOutFileStream.close();
-            }
-        }
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.fileSignature), sizeof(globalSettings.fileSignature));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorIdentifier), sizeof(globalSettings.compressorIdentifier));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorVersion), sizeof(globalSettings.compressorVersion));
@@ -225,7 +232,43 @@ void compressCore() {
         outFileStream.seekp(lastByteMaskOffset, ios::beg).write(reinterpret_cast<char*>(&currentMask), sizeof(currentMask));
         if (sessionSettings.verboseMode) // FUCK
             sendMessage(MSG_INFO, "Successfully compressed");
+        delete huffmanTree;
     } else {
+        unsigned int actualFileSignature = 0U;
+        inFileStream.read(reinterpret_cast<char*>(&actualFileSignature), sizeof(actualFileSignature));
+        if (actualFileSignature != globalSettings.fileSignature) {
+            string errMsgStr = "The file signature does not match; it may be in wrong format or broken";
+            sendMessage(MSG_ERROR, errMsgStr);
+            throw runtime_error(errMsgStr);
+        }
+        char actualCompressorIdentifier[globalSettings.COMPRESSOR_IDENTIFIER_SIZE] = {'\0'};
+        inFileStream.read(reinterpret_cast<char*>(actualCompressorIdentifier), sizeof(actualCompressorIdentifier));
+        // Ignore the compressor identifier
+        unsigned int actualCompressorVersion = 0U;
+        inFileStream.read(reinterpret_cast<char*>(&actualCompressorVersion), sizeof(actualCompressorVersion));
+        if (actualFileSignature > globalSettings.compressorVersion) {
+            ostringstream errMsg;
+            errMsg << "The compressed file is created with a newer version of Huffmanzip; update Huffmanzip to decompress it";
+            sendMessage(MSG_ERROR, errMsg.str());
+            throw runtime_error(errMsg.str());
+        }
+        unsigned long long actualHuffmanTableSize = 0ULL, actualCompressedSize = 0ULL;
+        unsigned char actualLastByteMask = '\0';
+        inFileStream.read(reinterpret_cast<char*>(&actualHuffmanTableSize), sizeof(actualHuffmanTableSize))
+                    .read(reinterpret_cast<char*>(&actualCompressedSize), sizeof(actualCompressedSize))
+                    .read(reinterpret_cast<char*>(&actualLastByteMask), sizeof(actualLastByteMask));
+        map<unsigned, unsigned char> codeByteMap;
+        for (unsigned long long i = 0ULL; i < actualHuffmanTableSize; i += sizeof(unsigned) + sizeof(unsigned char)) {
+            unsigned char tmpByte = '\0';
+            unsigned tmpCode = 0U;
+            if (inFileStream.read(reinterpret_cast<char*>(&tmpByte), sizeof(tmpByte)).read(reinterpret_cast<char*>(&tmpCode), sizeof(tmpCode))) {
+                codeByteMap[tmpCode] = tmpByte;
+            } else {
+                string errMsgStr = "The file seems to be broken";
+                sendMessage(MSG_ERROR, errMsgStr);
+                throw runtime_error(errMsgStr);
+            }
+        }
         // ...
     }
     outFileStream.close();
@@ -235,8 +278,16 @@ void compressCore() {
         TempFile::open(tmpFileStream, sessionSettings.outFilePath, ios::in);
         copyStream(tmpFileStream, cout);
     }
-    if (sessionSettings.useStdin)
+    if (sessionSettings.useStdin) {
         TempFile::remove(sessionSettings.inFilePath);
+    } else if (!sessionSettings.keepOriginalFile) {
+        if (remove(sessionSettings.inFilePath.c_str())) {
+            ostringstream warningMsg;
+            warningMsg << "Unable to delete input file " << sessionSettings.inFilePath << "; you may delete it yourself";
+            sendMessage(MSG_WARNING, warningMsg.str());
+            throw runtime_error(warningMsg.str());
+        }
+    }
     if (sessionSettings.useStdout) {
         delete tmpOutFile;
         tmpOutFile = NULL;
