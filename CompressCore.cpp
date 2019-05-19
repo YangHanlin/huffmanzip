@@ -224,6 +224,8 @@ void compressCore() {
         outFileStream.seekp(compressedSizeOffset, ios::beg).write(reinterpret_cast<char*>(&compressedSize), sizeof(compressedSize));
         outFileStream.seekp(lastByteMaskOffset, ios::beg).write(reinterpret_cast<char*>(&currentMask), sizeof(currentMask));
         outFileStream.close();
+        if (sessionSettings.verboseMode) // FUCK
+            sendMessage(MSG_INFO, "Successfully compressed");
     } else {
         sendMessage(MSG_WARNING, "Decompressing is not available for now");
     }
