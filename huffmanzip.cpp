@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     #ifdef DIRECT_DEBUG
     char *argvCandidate[] = {
         ".\\huffmanzip.exe",
-        "D:\\matto\\Documents\\Codes\\Homework\\DS-9p\\eng.easy.txt.test"
+        "D:\\matto\\Documents\\Codes\\Homework\\DS-9p\\eng.easy.txt.test",
         "-c"
     };
     argc = sizeof(argvCandidate) / sizeof(argvCandidate[0]);
