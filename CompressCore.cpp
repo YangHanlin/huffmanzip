@@ -194,14 +194,15 @@ void compressCore() {
         unsigned char currentByte = 0U, currentMask = 0U;
         while (inFileStream.read(reinterpret_cast<char*>(&outTmp), sizeof(outTmp))) {
             vector<bool> bits;
-            while (outTmp != 0U) {
-                bits.push_back(outTmp & 0x1U);
-                outTmp <<= 1;
+            unsigned huffmanCode = huffmanCodes[outTmp];
+            while (huffmanCode != 0U) {
+                bits.push_back(huffmanCode & 0x1U);
+                huffmanCode >>= 1;
             }
-            for (vector<bool>::reverse_iterator iter = bits.rbegin(); iter != bits.rend() - 1; ++iter) {
+            for (vector<bool>::reverse_iterator iter = bits.rbegin() + 1; iter != bits.rend(); ++iter) {
                 currentByte = (currentByte << 1) + *iter;
                 currentMask = (currentMask << 1) + 1;
-                if (currentMask == 0x7U) {
+                if (currentMask == 0xffU) {
                     outFileStream.write(reinterpret_cast<char*>(&currentByte), sizeof(currentByte));
                     currentByte = 0U;
                     currentMask = 0U;
@@ -211,9 +212,11 @@ void compressCore() {
         }
         if (currentMask == 0x0U) {
             currentMask = 0xffU;
-            --compressedSize;
+        } else {
+            ++compressedSize;
+            for (unsigned char i = currentMask; i != 0xffU; i = (i << 1) + 1, currentByte <<= 1);
+            outFileStream.write(reinterpret_cast<char*>(&currentByte), sizeof(currentByte));
         }
-        ++compressedSize;
         int huffmanTableSizeOffset = sizeof(globalSettings.fileSignature) + sizeof(globalSettings.compressorIdentifier) + sizeof(globalSettings.compressorVersion),
             compressedSizeOffset = huffmanTableSizeOffset + sizeof(ullPlaceHolder),
             lastByteMaskOffset = compressedSizeOffset + sizeof(ullPlaceHolder);
