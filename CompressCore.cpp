@@ -12,6 +12,7 @@
 #include <string>
 #include <queue>
 #include <vector>
+#include <map>
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
@@ -27,6 +28,7 @@ using std::fstream;
 using std::string;
 using std::priority_queue;
 using std::vector;
+using std::map;
 using std::copy;
 using std::ios;
 using std::istream_iterator;
@@ -250,6 +252,24 @@ void compressCore() {
             sendMessage(MSG_ERROR, errMsg.str());
             throw runtime_error(errMsg.str());
         }
+        unsigned long long actualHuffmanTableSize = 0ULL, actualCompressedSize = 0ULL;
+        unsigned char actualLastByteMask = '\0';
+        inFileStream.read(reinterpret_cast<char*>(&actualHuffmanTableSize), sizeof(actualHuffmanTableSize))
+                    .read(reinterpret_cast<char*>(&actualCompressedSize), sizeof(actualCompressedSize))
+                    .read(reinterpret_cast<char*>(&actualLastByteMask), sizeof(actualLastByteMask));
+        map<unsigned, unsigned char> codeByteMap;
+        for (unsigned long long i = 0ULL; i < actualHuffmanTableSize; i += sizeof(unsigned) + sizeof(unsigned char)) {
+            unsigned char tmpByte = '\0';
+            unsigned tmpCode = 0U;
+            if (inFileStream.read(reinterpret_cast<char*>(&tmpByte), sizeof(tmpByte)).read(reinterpret_cast<char*>(&tmpCode), sizeof(tmpCode))) {
+                codeByteMap[tmpCode] = tmpByte;
+            } else {
+                string errMsgStr = "The file seems to be broken";
+                sendMessage(MSG_ERROR, errMsgStr);
+                throw runtime_error(errMsgStr);
+            }
+        }
+        // ...
     }
     outFileStream.close();
     inFileStream.close();
