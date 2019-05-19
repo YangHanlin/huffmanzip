@@ -1,5 +1,7 @@
 // huffmanzip.cpp
 
+#define DIRECT_DEBUG
+
 #include "Settings.h"
 #include "Util.h"
 #include "CompressCore.h"
@@ -9,14 +11,15 @@
 using std::exception;
 
 int main(int argc, char *argv[]) {
-    // argc = 3;
-    // char *argvCandidate[] = {
-    //     "huffmanzip.exe",
-    //     "D:\\matto\\Documents\\Codes\\Homework\\ds-9p\\eng.easy.txt.test",
-    //     "-c",
-    //     // "D:\\matto\\Documents\\Codes\\Homework\\ds-9p\\eng.txt.test"
-    // };
-    // argv = argvCandidate;
+    #ifdef DIRECT_DEBUG
+    char *argvCandidate[] = {
+        ".\\huffmanzip.exe",
+        "D:\\matto\\Documents\\Codes\\Homework\\DS-9p\\eng.easy.txt.test",
+        "-c"
+    };
+    argc = sizeof(argvCandidate) / sizeof(argvCandidate[0]);
+    argv = argvCandidate;
+    #endif
     try {
         parseArgs(argc, argv);
         if (sessionSettings.showHelp) {
