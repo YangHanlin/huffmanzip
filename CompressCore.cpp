@@ -117,14 +117,21 @@ void compressCore() {
         tmpOutFile = new TempFile(ios::out);
         sessionSettings.outFilePath = tmpOutFile->path();
     }
+    fstream inFileStream(sessionSettings.inFilePath.c_str(), ios::in | ios::binary);
+    if (!inFileStream) {
+        ostringstream errMsg;
+        errMsg << "Unable to open " << (sessionSettings.useStdin ? "temporary file" : "input") << " " << sessionSettings.inFilePath;
+        sendMessage(MSG_ERROR, errMsg.str());
+        throw runtime_error(errMsg.str());
+    }
+    fstream outFileStream(sessionSettings.outFilePath.c_str(), ios::out | ios::binary);
+    if (!outFileStream) {
+        ostringstream errMsg;
+        errMsg << "Unable to open " << (sessionSettings.useStdout ? "temporary file" : "output") << " " << sessionSettings.outFilePath;
+        sendMessage(MSG_ERROR, errMsg.str());
+        throw runtime_error(errMsg.str());
+    }
     if (sessionSettings.compress) {
-        fstream inFileStream(sessionSettings.inFilePath.c_str(), ios::in | ios::binary);
-        if (!inFileStream) {
-            ostringstream errMsg;
-            errMsg << "Unable to open " << (sessionSettings.useStdin ? "temporary file" : "input") << " " << sessionSettings.inFilePath;
-            sendMessage(MSG_ERROR, errMsg.str());
-            throw runtime_error(errMsg.str());
-        }
         unsigned byteFrequencies[BYTE_SIZE] = {0U};
         unsigned originalSize = 0U;
         unsigned char tmp = '\0';
@@ -164,13 +171,6 @@ void compressCore() {
                 sendMessage(MSG_WARNING, warningMsg.str());
                 testOutFileStream.close();
             }
-        }
-        fstream outFileStream(sessionSettings.outFilePath.c_str(), ios::out | ios::binary);
-        if (!outFileStream) {
-            ostringstream errMsg;
-            errMsg << "Unable to open " << (sessionSettings.useStdout ? "temporary file" : "output") << " " << sessionSettings.outFilePath;
-            sendMessage(MSG_ERROR, errMsg.str());
-            throw runtime_error(errMsg.str());
         }
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.fileSignature), sizeof(globalSettings.fileSignature));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorIdentifier), sizeof(globalSettings.compressorIdentifier));
@@ -223,12 +223,13 @@ void compressCore() {
         outFileStream.seekp(huffmanTableSizeOffset, ios::beg).write(reinterpret_cast<char*>(&huffmanTableSize), sizeof(huffmanTableSize));
         outFileStream.seekp(compressedSizeOffset, ios::beg).write(reinterpret_cast<char*>(&compressedSize), sizeof(compressedSize));
         outFileStream.seekp(lastByteMaskOffset, ios::beg).write(reinterpret_cast<char*>(&currentMask), sizeof(currentMask));
-        outFileStream.close();
         if (sessionSettings.verboseMode) // FUCK
             sendMessage(MSG_INFO, "Successfully compressed");
     } else {
-        sendMessage(MSG_WARNING, "Decompressing is not available for now");
+        // ...
     }
+    outFileStream.close();
+    inFileStream.close();
     if (sessionSettings.useStdout) {
         fstream tmpFileStream;
         TempFile::open(tmpFileStream, sessionSettings.outFilePath, ios::in);
