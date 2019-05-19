@@ -208,7 +208,7 @@ void compressCore() {
             }
         }
         if (currentMask == 0x0U) {
-            currentMask == 0xffU;
+            currentMask = 0xffU;
             --compressedSize;
         }
         ++compressedSize;
