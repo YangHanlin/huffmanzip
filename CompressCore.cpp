@@ -194,8 +194,10 @@ void compressCore() {
         unsigned char currentByte = 0U, currentMask = 0U;
         while (inFileStream.read(reinterpret_cast<char*>(&outTmp), sizeof(outTmp))) {
             vector<bool> bits;
-            while (outTmp != 0U)
+            while (outTmp != 0U) {
                 bits.push_back(outTmp & 0x1U);
+                outTmp <<= 1;
+            }
             for (vector<bool>::reverse_iterator iter = bits.rbegin(); iter != bits.rend() - 1; ++iter) {
                 currentByte = (currentByte << 1) + *iter;
                 currentMask = (currentMask << 1) + 1;
