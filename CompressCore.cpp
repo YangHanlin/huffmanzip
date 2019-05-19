@@ -156,8 +156,13 @@ void compressCore() {
             nodeQueue.push(treeCombined);
         }
         // cout << "Huffman tree has been constructed\n"; // Fucks
-        BinaryTree<HuffmanNode> *huffmanTree = nodeQueue.top();
-        nodeQueue.pop();
+        BinaryTree<HuffmanNode> *huffmanTree = NULL;
+        if (!nodeQueue.empty()) {
+            huffmanTree = nodeQueue.top();
+            nodeQueue.pop();
+        } else {
+            huffmanTree = new BinaryTree<HuffmanNode>;
+        }
         unsigned huffmanCodes[BYTE_SIZE] = {0U};
         genHuffmanCode(huffmanTree, huffmanCodes);
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
