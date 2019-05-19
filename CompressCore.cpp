@@ -124,6 +124,15 @@ void compressCore() {
         sendMessage(MSG_ERROR, errMsg.str());
         throw runtime_error(errMsg.str());
     }
+    if (!sessionSettings.useStdout) {
+        fstream testOutFileStream(sessionSettings.outFilePath.c_str(), ios::in | ios::binary);
+        if (testOutFileStream) {
+            ostringstream warningMsg;
+            warningMsg << "The output file " << sessionSettings.outFilePath << " already exists; its content will be cleared";
+            sendMessage(MSG_WARNING, warningMsg.str());
+            testOutFileStream.close();
+        }
+    }
     fstream outFileStream(sessionSettings.outFilePath.c_str(), ios::out | ios::binary);
     if (!outFileStream) {
         ostringstream errMsg;
@@ -168,15 +177,6 @@ void compressCore() {
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
             if (huffmanCodes[i] != 0)
                 cout << i << ": " << toBinary(huffmanCodes[i]) << "\n";
-        if (!sessionSettings.useStdout) {
-            fstream testOutFileStream(sessionSettings.outFilePath.c_str(), ios::in | ios::binary);
-            if (testOutFileStream) {
-                ostringstream warningMsg;
-                warningMsg << "The output file " << sessionSettings.outFilePath << " already exists; its content will be cleared";
-                sendMessage(MSG_WARNING, warningMsg.str());
-                testOutFileStream.close();
-            }
-        }
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.fileSignature), sizeof(globalSettings.fileSignature));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorIdentifier), sizeof(globalSettings.compressorIdentifier));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorVersion), sizeof(globalSettings.compressorVersion));
