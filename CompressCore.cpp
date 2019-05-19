@@ -242,8 +242,16 @@ void compressCore() {
         TempFile::open(tmpFileStream, sessionSettings.outFilePath, ios::in);
         copyStream(tmpFileStream, cout);
     }
-    if (sessionSettings.useStdin)
+    if (sessionSettings.useStdin) {
         TempFile::remove(sessionSettings.inFilePath);
+    } else if (!sessionSettings.keepOriginalFile) {
+        if (remove(sessionSettings.inFilePath.c_str())) {
+            ostringstream warningMsg;
+            warningMsg << "Unable to delete input file " << sessionSettings.inFilePath << "; you may delete it yourself";
+            sendMessage(MSG_WARNING, warningMsg.str());
+            throw runtime_error(warningMsg.str());
+        }
+    }
     if (sessionSettings.useStdout) {
         delete tmpOutFile;
         tmpOutFile = NULL;
