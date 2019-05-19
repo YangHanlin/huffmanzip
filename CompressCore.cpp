@@ -233,7 +233,17 @@ void compressCore() {
             sendMessage(MSG_ERROR, errMsgStr);
             throw runtime_error(errMsgStr);
         }
-        sendMessage(MSG_WARNING, "Not available yet");
+        char actualCompressorIdentifier[globalSettings.COMPRESSOR_IDENTIFIER_SIZE] = {'\0'};
+        inFileStream.read(reinterpret_cast<char*>(actualCompressorIdentifier), sizeof(actualCompressorIdentifier));
+        // Ignore the compressor identifier
+        unsigned int actualCompressorVersion = 0U;
+        inFileStream.read(reinterpret_cast<char*>(&actualCompressorVersion), sizeof(actualCompressorVersion));
+        if (actualFileSignature > globalSettings.compressorVersion) {
+            ostringstream errMsg;
+            errMsg << "The compressed file is created with a newer version of Huffmanzip; update Huffmanzip to decompress it";
+            sendMessage(MSG_ERROR, errMsg.str());
+            throw runtime_error(errMsg.str());
+        }
     }
     outFileStream.close();
     inFileStream.close();
