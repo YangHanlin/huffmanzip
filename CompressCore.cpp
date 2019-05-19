@@ -230,6 +230,7 @@ void compressCore() {
         outFileStream.seekp(lastByteMaskOffset, ios::beg).write(reinterpret_cast<char*>(&currentMask), sizeof(currentMask));
         if (sessionSettings.verboseMode) // FUCK
             sendMessage(MSG_INFO, "Successfully compressed");
+        delete huffmanTree;
     } else {
         unsigned int actualFileSignature = 0U;
         inFileStream.read(reinterpret_cast<char*>(&actualFileSignature), sizeof(actualFileSignature));
