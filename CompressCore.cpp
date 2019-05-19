@@ -226,7 +226,14 @@ void compressCore() {
         if (sessionSettings.verboseMode) // FUCK
             sendMessage(MSG_INFO, "Successfully compressed");
     } else {
-        // ...
+        unsigned int actualFileSignature = 0U;
+        inFileStream.read(reinterpret_cast<char*>(&actualFileSignature), sizeof(actualFileSignature));
+        if (actualFileSignature != globalSettings.fileSignature) {
+            string errMsgStr = "The file signature does not match; it may be in wrong format or broken";
+            sendMessage(MSG_ERROR, errMsgStr);
+            throw runtime_error(errMsgStr);
+        }
+        sendMessage(MSG_WARNING, "Not available yet");
     }
     outFileStream.close();
     inFileStream.close();
