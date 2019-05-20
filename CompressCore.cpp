@@ -264,12 +264,21 @@ void compressCore() {
             if (inFileStream.read(reinterpret_cast<char*>(&tmpByte), sizeof(tmpByte)).read(reinterpret_cast<char*>(&tmpCode), sizeof(tmpCode))) {
                 codeByteMap[tmpCode] = tmpByte;
             } else {
-                string errMsgStr = "The file seems to be broken";
+                string errMsgStr = "Failed to load complete Huffman table; the file may be broken";
                 sendMessage(MSG_ERROR, errMsgStr);
                 throw runtime_error(errMsgStr);
             }
         }
-        // ...
+        unsigned long long measuredCompressedSize = 0ULL;
+        unsigned char currentByte = '\0', prevByte = '\0';
+        unsigned int currentCode = 0U;
+        if (inFileStream.read(reinterpret_cast<char*>(&prevByte), sizeof(prevByte))) {
+            ++measuredCompressedSize;
+            while (inFileStream.read(reinterpret_cast<char*>(&currentByte), sizeof(currentByte))) {
+                ++measuredCompressedSize;
+            }
+            // ...
+        }
     }
     outFileStream.close();
     inFileStream.close();
