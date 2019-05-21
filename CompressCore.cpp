@@ -174,6 +174,11 @@ void compressCore() {
         } else {
             huffmanTree = new BinaryTree<HuffmanNode>;
         }
+        if (huffmanTree->root().lchild().null() && huffmanTree->root().rchild().null()) {
+            BinaryTree<HuffmanNode> *tmpHuffmanTree = new BinaryTree(HuffmanNode('\0', huffmanTree->root()->weight));
+            tmpHuffmanTree->move(tmpHuffmanTree->root().lchild(), huffmanTree->root());
+            huffmanTree = tmpHuffmanTree;
+        }
         unsigned huffmanCodes[BYTE_SIZE] = {0U};
         genHuffmanCode(huffmanTree, huffmanCodes);
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
