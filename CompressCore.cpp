@@ -246,7 +246,7 @@ void compressCore() {
         // Ignore the compressor identifier
         unsigned int actualCompressorVersion = 0U;
         inFileStream.read(reinterpret_cast<char*>(&actualCompressorVersion), sizeof(actualCompressorVersion));
-        if (actualFileSignature > globalSettings.compressorVersion) {
+        if (actualCompressorVersion > globalSettings.compressorVersion) {
             ostringstream errMsg;
             errMsg << "The compressed file is created with a newer version of Huffmanzip; update Huffmanzip to decompress it";
             sendMessage(MSG_ERROR, errMsg.str());
