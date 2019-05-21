@@ -1,5 +1,6 @@
 // CompressCore.cpp
 // Note: >1 / != 1
+// TODO: Polishment; implement all features
 
 #include "CompressCore.h"
 #include "Settings.h"
@@ -302,6 +303,7 @@ void compressCore() {
                     }
                 }
         }
+        // TODO: Verify the compressed size (measured & claimed)
         if (sessionSettings.verboseMode)
             sendMessage(MSG_INFO, "Successfully decompressed");
     }
