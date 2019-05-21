@@ -77,8 +77,8 @@ autotest-result-*.log
 # Makefile (ignored as the Makefile is platform-specific)
 Makefile
 
-# Test file
-*.test
+# Test files
+tests/
 
 # Huffmanzip files
 *.Huffmanzip
