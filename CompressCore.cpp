@@ -199,7 +199,7 @@ void compressCore() {
         unsigned char outTmp = '\0';
         unsigned long long compressedSize = 0ULL;
         unsigned char currentByte = 0U, currentMask = 0U;
-        while (inFileStream.read(reinterpret_cast<char*>(&outTmp), sizeof(outTmp))) {
+        while (inFileStream.read(reinterpret_cast<char*>(&outTmp), sizeof(outTmp))) { // TODO: Use bitwise operations to simply code (and speed up?)
             vector<bool> bits;
             unsigned huffmanCode = huffmanCodes[outTmp];
             while (huffmanCode != 0U) {
@@ -221,7 +221,7 @@ void compressCore() {
             currentMask = 0xffU;
         } else {
             ++compressedSize;
-            for (unsigned char i = currentMask; i != 0xffU; i = (i << 1) + 1, currentByte <<= 1);
+            for (unsigned char i = currentMask; i != 0xffU; i = (i << 1) + 1, currentByte <<= 1, currentMask <<= 1);
             outFileStream.write(reinterpret_cast<char*>(&currentByte), sizeof(currentByte));
         }
         int huffmanTableSizeOffset = sizeof(globalSettings.fileSignature) + sizeof(globalSettings.compressorIdentifier) + sizeof(globalSettings.compressorVersion),
@@ -271,14 +271,34 @@ void compressCore() {
         }
         unsigned long long measuredCompressedSize = 0ULL;
         unsigned char currentByte = '\0', prevByte = '\0';
-        unsigned int currentCode = 0U;
+        unsigned int currentCode = 1U;
         if (inFileStream.read(reinterpret_cast<char*>(&prevByte), sizeof(prevByte))) {
             ++measuredCompressedSize;
             while (inFileStream.read(reinterpret_cast<char*>(&currentByte), sizeof(currentByte))) {
                 ++measuredCompressedSize;
+                for (int i = 0; i < 8; ++i) {
+                    currentCode = (currentCode << 1) + ((prevByte >> (7 - i)) & 0x1U);
+                    map<unsigned, unsigned char>::iterator iter = codeByteMap.find(currentCode);
+                    if (iter != codeByteMap.end()) {
+                        outFileStream.write(reinterpret_cast<char*>(&iter->second), sizeof(iter->second));
+                        currentCode = 1U;
+                    }
+                }
+                prevByte = currentByte;
             }
-            // ...
+            // For robustness considerations, it is NOT required that the "dirty bits" in the last byte have to be all 0.
+            for (int i = 0; i < 8; ++i)
+                if ((actualLastByteMask >> (7 - i)) & 0x1U) {
+                    currentCode = (currentCode << 1) + ((prevByte >> (7 - i)) & 0x1U);
+                    map<unsigned, unsigned char>::iterator iter = codeByteMap.find(currentCode);
+                    if (iter != codeByteMap.end()) {
+                        outFileStream.write(reinterpret_cast<char*>(&iter->second), sizeof(iter->second));
+                        currentCode = 1U;
+                    }
+                }
         }
+        if (sessionSettings.verboseMode)
+            sendMessage(MSG_INFO, "Successfully decompressed");
     }
     outFileStream.close();
     inFileStream.close();
