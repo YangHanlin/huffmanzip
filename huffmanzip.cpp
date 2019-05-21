@@ -1,6 +1,6 @@
 // huffmanzip.cpp
 
-#define DIRECT_DEBUG
+// #define DIRECT_DEBUG
 
 #include "Settings.h"
 #include "Util.h"
@@ -13,9 +13,7 @@ using std::exception;
 int main(int argc, char *argv[]) {
     #ifdef DIRECT_DEBUG
     char *argvCandidate[] = {
-        ".\\huffmanzip.exe",
-        "D:\\matto\\Documents\\Codes\\Homework\\DS-9p\\eng.easy.txt.test",
-        "-c"
+        ".\\huffmanzip.exe"
     };
     argc = sizeof(argvCandidate) / sizeof(argvCandidate[0]);
     argv = argvCandidate;
