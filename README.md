@@ -7,7 +7,7 @@
 **Important**: The developer is still working on this project; it will not be ready until after some time. Current status:
 
 ```
-Working on the core part of compressing.
+Completed the core part of compressing & decompressing; working on some polishment of the code.
 ```
 
 Huffmanzip is a single-file, command-line (toy) compressor & decompressor, using Huffman coding to reduce the size of the file being compressed.
