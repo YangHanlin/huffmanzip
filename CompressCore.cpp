@@ -285,7 +285,7 @@ void compressCore() {
                     }
                 }
                 prevByte = currentByte;
-            }
+            } 
             // For robustness considerations, it is NOT required that the "dirty bits" in the last byte have to be all 0.
             for (int i = 0; i < 8; ++i)
                 if ((actualLastByteMask >> (7 - i)) & 0x1U) {
