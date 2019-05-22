@@ -151,7 +151,7 @@ void compressCore() {
             ++byteFrequencies[tmp];
             ++originalSize;
         }
-        print(cout, byteFrequencies);
+        // print(cout, byteFrequencies);
         priority_queue<BinaryTree<HuffmanNode>*, vector<BinaryTree<HuffmanNode>*>, HuffmanNodeCompare> nodeQueue;
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
             if (byteFrequencies[i] > 0)
@@ -182,9 +182,9 @@ void compressCore() {
         }
         unsigned huffmanCodes[BYTE_SIZE] = {0U};
         genHuffmanCode(huffmanTree, huffmanCodes);
-        for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
-            if (huffmanCodes[i] != 0)
-                cout << i << ": " << toBinary(huffmanCodes[i]) << "\n";
+        // for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
+        //     if (huffmanCodes[i] != 0)
+        //         cout << i << ": " << toBinary(huffmanCodes[i]) << "\n";
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.fileSignature), sizeof(globalSettings.fileSignature));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorIdentifier), sizeof(globalSettings.compressorIdentifier));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorVersion), sizeof(globalSettings.compressorVersion));
