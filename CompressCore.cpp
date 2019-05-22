@@ -19,6 +19,7 @@
 #include <stdexcept>
 #include <cstdio>
 #include <cstdlib>
+#include <ctime>
 
 using std::cin;
 using std::cout;
@@ -136,6 +137,7 @@ void compressCore() {
             testOutFileStream.close();
         }
     }
+    clock_t clockBefore = 0L, clockAfter = 0L;
     fstream outFileStream(sessionSettings.outFilePath.c_str(), ios::out | ios::binary);
     if (!outFileStream) {
         ostringstream errMsg;
@@ -144,8 +146,9 @@ void compressCore() {
         throw runtime_error(errMsg.str());
     }
     if (sessionSettings.compress) {
+        clockBefore = clock();
         unsigned byteFrequencies[BYTE_SIZE] = {0U};
-        unsigned originalSize = 0U;
+        unsigned long long originalSize = 0ULL;
         unsigned char tmp = '\0';
         while (inFileStream.read(reinterpret_cast<char*>(&tmp), sizeof(tmp))) {
             ++byteFrequencies[tmp];
@@ -236,10 +239,17 @@ void compressCore() {
         outFileStream.seekp(huffmanTableSizeOffset, ios::beg).write(reinterpret_cast<char*>(&huffmanTableSize), sizeof(huffmanTableSize));
         outFileStream.seekp(compressedSizeOffset, ios::beg).write(reinterpret_cast<char*>(&compressedSize), sizeof(compressedSize));
         outFileStream.seekp(lastByteMaskOffset, ios::beg).write(reinterpret_cast<char*>(&currentMask), sizeof(currentMask));
-        if (sessionSettings.verboseMode) // FUCK
-            sendMessage(MSG_INFO, "Successfully compressed");
+        clockAfter = clock();
+        if (sessionSettings.verboseMode) {
+            sendMessage(MSG_INFO, "Compression completed");
+            unsigned long long totalCompressedSize = lastByteMaskOffset + sizeof(currentMask) + huffmanTableSize + compressedSize;
+            ostringstream infoMsg;
+            infoMsg << "Compression rate = " << static_cast<double>(totalCompressedSize) / static_cast<double>(originalSize) * 100.0 << "%, time consumed = ~" << static_cast<double>(clockAfter - clockBefore) / static_cast<double>(CLOCKS_PER_SEC) << "s";
+            sendMessage(MSG_INFO, infoMsg.str());
+        }
         delete huffmanTree;
     } else {
+        clockBefore = clock();
         unsigned int actualFileSignature = 0U;
         inFileStream.read(reinterpret_cast<char*>(&actualFileSignature), sizeof(actualFileSignature));
         if (actualFileSignature != globalSettings.fileSignature) {
@@ -303,9 +313,14 @@ void compressCore() {
                     }
                 }
         }
+        clockAfter = clock();
         // TODO: Verify the compressed size (measured & claimed)
-        if (sessionSettings.verboseMode)
-            sendMessage(MSG_INFO, "Successfully decompressed");
+        if (sessionSettings.verboseMode) {
+            sendMessage(MSG_INFO, "Decompression completed");
+            ostringstream infoMsg;
+            infoMsg << "Time consumed = " << static_cast<double>(clockAfter - clockBefore) / static_cast<double>(CLOCKS_PER_SEC) << "s";
+            sendMessage(MSG_INFO, infoMsg.str());
+        }
     }
     outFileStream.close();
     inFileStream.close();
