@@ -23,8 +23,8 @@ struct OptionChange {
 };
 
 const char defaultCompressorIdentifier[GlobalSettings::COMPRESSOR_IDENTIFIER_SIZE] = {'H', 'U', 'F', 'M', 'A', 'N', 'Z'};
-const unsigned defaultCompressorVersion = 0U;
-const string defaultCompressorVersionStr = "0.0";
+const unsigned defaultCompressorVersion = 1U;
+const string defaultCompressorVersionStr = "0.9";
 const unsigned defaultFileSignature = 0xaabbccddU;
 const string defaultFileSuffix = ".huffmanzip";
 
