@@ -313,7 +313,8 @@ void compressCore() {
                 }
         }
         clockAfter = clock();
-        // TODO: Verify the compressed size (measured & claimed)
+        if (actualCompressedSize != measuredCompressedSize)
+            sendMessage(MSG_WARNING, "Claimed and measured compressed data size does not match; the file may have been broken");
         if (sessionSettings.verboseMode) {
             sendMessage(MSG_INFO, "Decompression completed");
             ostringstream infoMsg;
