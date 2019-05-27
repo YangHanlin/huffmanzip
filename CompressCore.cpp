@@ -206,7 +206,8 @@ void compressCore() {
         unsigned char outTmp = '\0';
         unsigned long long compressedSize = 0ULL;
         unsigned char currentByte = 0U, currentMask = 0U;
-        while (inFileStream.read(reinterpret_cast<char*>(&outTmp), sizeof(outTmp))) { // TODO: Use bitwise operations to simply code (and speed up?)
+        // TODO: Use bitwise operations to simply code (and speed up?)
+        while (inFileStream.read(reinterpret_cast<char*>(&outTmp), sizeof(outTmp))) {
             vector<bool> bits;
             unsigned huffmanCode = huffmanCodes[outTmp];
             while (huffmanCode != 0U) {
