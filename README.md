@@ -2,7 +2,7 @@
 
 [![Issues](https://img.shields.io/github/issues/YangHanlin/huffmanzip.svg)](https://github.com/YangHanlin/huffmanzip/issues) [![Pull requests](https://img.shields.io/github/issues-pr/YangHanlin/huffmanzip.svg)](https://github.com/YangHanlin/huffmanzip/pulls) [![License](https://img.shields.io/github/license/YangHanlin/huffmanzip.svg)](https://github.com/YangHanlin/huffmanzip/blob/master/LICENSE)
 
-> **Notice:** While the [first version (v0.9-alpha)](https://github.com/YangHanlin/huffmanzip/releases/tag/v0.9-alpha) has been released, I am still working on the documentation. Please wait for a while.
+> **Notice:** While the [first beta version (`v0.10-beta`)](https://github.com/YangHanlin/huffmanzip/releases/tag/v0.10-beta) has been released, I am still working on the documentation. Please wait for a while.
 
 **Important**: The developer is still working on this project; it will not be ready until after some time. Current status:
 
