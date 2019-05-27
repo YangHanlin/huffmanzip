@@ -12,8 +12,6 @@
 #include <queue>
 #include <vector>
 #include <map>
-#include <algorithm>
-#include <iterator>
 #include <stdexcept>
 #include <cstdio>
 #include <cstdlib>
@@ -23,16 +21,13 @@ using std::cin;
 using std::cout;
 using std::istream;
 using std::ostream;
+using std::ios;
 using std::ostringstream;
 using std::fstream;
 using std::string;
 using std::priority_queue;
 using std::vector;
 using std::map;
-using std::copy;
-using std::ios;
-using std::istream_iterator;
-using std::ostream_iterator;
 using std::runtime_error;
 
 #include <iomanip>
