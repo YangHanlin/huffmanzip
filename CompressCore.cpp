@@ -30,15 +30,11 @@ using std::vector;
 using std::map;
 using std::runtime_error;
 
-#include <iomanip>
-using std::setbase;
 const size_t BYTE_SIZE = 256;
 
-void test();
-ostream &print(ostream &os, const unsigned *arr);
-string toBinary(unsigned num);
 void genHuffmanCode(const BinaryTree<HuffmanNode> *tree, unsigned *arr);
 void genHuffmanCode(const BinaryTree<HuffmanNode>::ConstIterator &iter, unsigned *arr, unsigned code);
+ostream &copyStream(istream &is, ostream &os);
 
 TempFile::TempFile(ios::openmode openMode, bool autoRemove) :
     filePath(tmpnam(NULL) + sessionSettings.programName + ".tmp"),
@@ -86,13 +82,6 @@ HuffmanNode::HuffmanNode(unsigned char byte, unsigned weight) : byte(byte), weig
 
 bool HuffmanNodeCompare::operator()(const BinaryTree<HuffmanNode> *lhs, const BinaryTree<HuffmanNode> *rhs) const {
     return lhs->root()->weight > rhs->root()->weight;
-}
-
-ostream &copyStream(istream &is, ostream &os) {
-    char tmp = '\0';
-    while (is.get(tmp))
-        os << tmp;
-    return os;
 }
 
 void compressCore() {
@@ -147,7 +136,6 @@ void compressCore() {
             ++byteFrequencies[tmp];
             ++originalSize;
         }
-        // print(cout, byteFrequencies);
         priority_queue<BinaryTree<HuffmanNode>*, vector<BinaryTree<HuffmanNode>*>, HuffmanNodeCompare> nodeQueue;
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
             if (byteFrequencies[i] > 0)
@@ -158,12 +146,10 @@ void compressCore() {
             BinaryTree<HuffmanNode> *tree2 = nodeQueue.top();
             nodeQueue.pop();
             BinaryTree<HuffmanNode> *treeCombined = new BinaryTree(HuffmanNode('\0', tree1->root()->weight + tree2->root()->weight));
-            // cout << tree1->root()->weight << " + " << tree2->root()->weight << " = " << treeCombined->root()->weight << "\n";
             treeCombined->move(treeCombined->root().lchild(), tree1->root());
             treeCombined->move(treeCombined->root().rchild(), tree2->root());
             nodeQueue.push(treeCombined);
         }
-        // cout << "Huffman tree has been constructed\n";
         BinaryTree<HuffmanNode> *huffmanTree = NULL;
         if (!nodeQueue.empty()) {
             huffmanTree = nodeQueue.top();
@@ -178,9 +164,6 @@ void compressCore() {
         }
         unsigned huffmanCodes[BYTE_SIZE] = {0U};
         genHuffmanCode(huffmanTree, huffmanCodes);
-        // for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
-        //     if (huffmanCodes[i] != 0)
-        //         cout << i << ": " << toBinary(huffmanCodes[i]) << "\n";
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.fileSignature), sizeof(globalSettings.fileSignature));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorIdentifier), sizeof(globalSettings.compressorIdentifier));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorVersion), sizeof(globalSettings.compressorVersion));
@@ -340,36 +323,11 @@ void compressCore() {
     }
 }
 
-void test() {
-    fstream fin(sessionSettings.inFilePath.c_str(), ios::in | ios::binary), fout(sessionSettings.outFilePath.c_str(), ios::out | ios::binary);
-    if (!fin) {
-        ostringstream errMsg;
-        errMsg << "Unable to open input file " << sessionSettings.inFilePath;
-        sendMessage(MSG_ERROR, errMsg.str());
-        throw runtime_error(errMsg.str());
-    }
-    if (!fout) {
-        ostringstream errMsg;
-        errMsg << "Unable to open output file " << sessionSettings.outFilePath;
-        sendMessage(MSG_ERROR, errMsg.str());
-        throw runtime_error(errMsg.str());
-    }
-    copyStream(fin, fout);
-}
-
-ostream &print(ostream &os, const unsigned *arr) {
-    for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
-        if (arr[i] != 0U)
-            os << setbase(16) << (int)i << "("
-               << setbase(10) << i << "): "
-               << arr[i] << "\n";
+ostream &copyStream(istream &is, ostream &os) {
+    char tmp = '\0';
+    while (is.get(tmp))
+        os << tmp;
     return os;
-}
-
-string toBinary(unsigned num) {
-    if (num == 0U)
-        return "";
-    return toBinary(num / 2U) + (num % 2U ? "1" : "0");
 }
 
 void genHuffmanCode(const BinaryTree<HuffmanNode> *tree, unsigned *arr) {
