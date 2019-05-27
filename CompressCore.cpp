@@ -300,7 +300,7 @@ void compressCore() {
                     }
                 }
                 prevByte = currentByte;
-            } 
+            }
             // For robustness considerations, it is NOT required that the "dirty bits" in the last byte have to be all 0.
             for (int i = 0; i < 8; ++i)
                 if ((actualLastByteMask >> (7 - i)) & 0x1U) {
@@ -314,7 +314,7 @@ void compressCore() {
         }
         clockAfter = clock();
         if (actualCompressedSize != measuredCompressedSize)
-            sendMessage(MSG_WARNING, "Claimed and measured compressed data size does not match; the file may have been broken");
+            sendMessage(MSG_WARNING, "Claimed and measured compressed data sizes do not match; the file may have been broken");
         if (sessionSettings.verboseMode) {
             sendMessage(MSG_INFO, "Decompression completed");
             ostringstream infoMsg;
