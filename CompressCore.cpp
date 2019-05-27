@@ -35,6 +35,8 @@ const size_t BYTE_SIZE = 256;
 void genHuffmanCode(const BinaryTree<HuffmanNode> *tree, unsigned *arr);
 void genHuffmanCode(const BinaryTree<HuffmanNode>::ConstIterator &iter, unsigned *arr, unsigned code);
 ostream &copyStream(istream &is, ostream &os);
+void compress(fstream &inFileStream, fstream &outFileStream);
+void decompress(fstream &inFileStream, fstream &outFileStream);
 
 TempFile::TempFile(ios::openmode openMode, bool autoRemove) :
     filePath(tmpnam(NULL) + sessionSettings.programName + ".tmp"),
@@ -119,7 +121,6 @@ void compressCore() {
             testOutFileStream.close();
         }
     }
-    clock_t clockBefore = 0L, clockAfter = 0L;
     fstream outFileStream(sessionSettings.outFilePath.c_str(), ios::out | ios::binary);
     if (!outFileStream) {
         ostringstream errMsg;
@@ -127,179 +128,10 @@ void compressCore() {
         sendMessage(MSG_ERROR, errMsg.str());
         throw runtime_error(errMsg.str());
     }
-    if (sessionSettings.compress) {
-        clockBefore = clock();
-        unsigned byteFrequencies[BYTE_SIZE] = {0U};
-        unsigned long long originalSize = 0ULL;
-        unsigned char tmp = '\0';
-        while (inFileStream.read(reinterpret_cast<char*>(&tmp), sizeof(tmp))) {
-            ++byteFrequencies[tmp];
-            ++originalSize;
-        }
-        priority_queue<BinaryTree<HuffmanNode>*, vector<BinaryTree<HuffmanNode>*>, HuffmanNodeCompare> nodeQueue;
-        for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
-            if (byteFrequencies[i] > 0)
-                nodeQueue.push(new BinaryTree(HuffmanNode(i, byteFrequencies[i])));
-        while (nodeQueue.size() > 1) {
-            BinaryTree<HuffmanNode> *tree1 = nodeQueue.top();
-            nodeQueue.pop();
-            BinaryTree<HuffmanNode> *tree2 = nodeQueue.top();
-            nodeQueue.pop();
-            BinaryTree<HuffmanNode> *treeCombined = new BinaryTree(HuffmanNode('\0', tree1->root()->weight + tree2->root()->weight));
-            treeCombined->move(treeCombined->root().lchild(), tree1->root());
-            treeCombined->move(treeCombined->root().rchild(), tree2->root());
-            nodeQueue.push(treeCombined);
-        }
-        BinaryTree<HuffmanNode> *huffmanTree = NULL;
-        if (!nodeQueue.empty()) {
-            huffmanTree = nodeQueue.top();
-            nodeQueue.pop();
-        } else {
-            huffmanTree = new BinaryTree<HuffmanNode>;
-        }
-        if (huffmanTree->root().lchild().null() && huffmanTree->root().rchild().null()) {
-            BinaryTree<HuffmanNode> *tmpHuffmanTree = new BinaryTree(HuffmanNode('\0', huffmanTree->root()->weight));
-            tmpHuffmanTree->move(tmpHuffmanTree->root().lchild(), huffmanTree->root());
-            huffmanTree = tmpHuffmanTree;
-        }
-        unsigned huffmanCodes[BYTE_SIZE] = {0U};
-        genHuffmanCode(huffmanTree, huffmanCodes);
-        outFileStream.write(reinterpret_cast<char*>(&globalSettings.fileSignature), sizeof(globalSettings.fileSignature));
-        outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorIdentifier), sizeof(globalSettings.compressorIdentifier));
-        outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorVersion), sizeof(globalSettings.compressorVersion));
-        unsigned long long ullPlaceHolder = 0U; unsigned char ucPlaceHolder = '\0';
-        outFileStream.write(reinterpret_cast<char*>(&ullPlaceHolder), sizeof(ullPlaceHolder));
-        outFileStream.write(reinterpret_cast<char*>(&ullPlaceHolder), sizeof(ullPlaceHolder));
-        outFileStream.write(reinterpret_cast<char*>(&ucPlaceHolder), sizeof(ucPlaceHolder));
-        unsigned long long huffmanTableSize = 0ULL;
-        for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
-            if (huffmanCodes[i] != 0U) {
-                unsigned char ci = i;
-                outFileStream.write(reinterpret_cast<char*>(&ci), sizeof(ci));
-                outFileStream.write(reinterpret_cast<char*>(&huffmanCodes[i]), sizeof(huffmanCodes[i]));
-                huffmanTableSize += sizeof(ci) + sizeof(huffmanCodes[i]);
-            }
-        inFileStream.clear();
-        inFileStream.seekg(ios::beg);
-        unsigned char outTmp = '\0';
-        unsigned long long compressedSize = 0ULL;
-        unsigned char currentByte = 0U, currentMask = 0U;
-        // TODO: Use bitwise operations to simply code (and speed up?)
-        while (inFileStream.read(reinterpret_cast<char*>(&outTmp), sizeof(outTmp))) {
-            vector<bool> bits;
-            unsigned huffmanCode = huffmanCodes[outTmp];
-            while (huffmanCode != 0U) {
-                bits.push_back(huffmanCode & 0x1U);
-                huffmanCode >>= 1;
-            }
-            for (vector<bool>::reverse_iterator iter = bits.rbegin() + 1; iter != bits.rend(); ++iter) {
-                currentByte = (currentByte << 1) + *iter;
-                currentMask = (currentMask << 1) + 1;
-                if (currentMask == 0xffU) {
-                    outFileStream.write(reinterpret_cast<char*>(&currentByte), sizeof(currentByte));
-                    currentByte = 0U;
-                    currentMask = 0U;
-                    ++compressedSize;
-                }
-            }
-        }
-        if (currentMask == 0x0U) {
-            currentMask = 0xffU;
-        } else {
-            ++compressedSize;
-            for (unsigned char i = currentMask; i != 0xffU; i = (i << 1) + 1, currentByte <<= 1, currentMask <<= 1);
-            outFileStream.write(reinterpret_cast<char*>(&currentByte), sizeof(currentByte));
-        }
-        int huffmanTableSizeOffset = sizeof(globalSettings.fileSignature) + sizeof(globalSettings.compressorIdentifier) + sizeof(globalSettings.compressorVersion),
-            compressedSizeOffset = huffmanTableSizeOffset + sizeof(ullPlaceHolder),
-            lastByteMaskOffset = compressedSizeOffset + sizeof(ullPlaceHolder);
-        outFileStream.seekp(huffmanTableSizeOffset, ios::beg).write(reinterpret_cast<char*>(&huffmanTableSize), sizeof(huffmanTableSize));
-        outFileStream.seekp(compressedSizeOffset, ios::beg).write(reinterpret_cast<char*>(&compressedSize), sizeof(compressedSize));
-        outFileStream.seekp(lastByteMaskOffset, ios::beg).write(reinterpret_cast<char*>(&currentMask), sizeof(currentMask));
-        clockAfter = clock();
-        if (sessionSettings.verboseMode) {
-            sendMessage(MSG_INFO, "Compression completed");
-            unsigned long long totalCompressedSize = lastByteMaskOffset + sizeof(currentMask) + huffmanTableSize + compressedSize;
-            ostringstream infoMsg;
-            infoMsg << "Compression rate = " << static_cast<double>(totalCompressedSize) / static_cast<double>(originalSize) * 100.0 << "%, time consumed = ~" << static_cast<double>(clockAfter - clockBefore) / static_cast<double>(CLOCKS_PER_SEC) << "s";
-            sendMessage(MSG_INFO, infoMsg.str());
-        }
-        delete huffmanTree;
-    } else {
-        clockBefore = clock();
-        unsigned int actualFileSignature = 0U;
-        inFileStream.read(reinterpret_cast<char*>(&actualFileSignature), sizeof(actualFileSignature));
-        if (actualFileSignature != globalSettings.fileSignature) {
-            string errMsgStr = "The file signature does not match; it may be in wrong format or broken";
-            sendMessage(MSG_ERROR, errMsgStr);
-            throw runtime_error(errMsgStr);
-        }
-        char actualCompressorIdentifier[globalSettings.COMPRESSOR_IDENTIFIER_SIZE] = {'\0'};
-        inFileStream.read(reinterpret_cast<char*>(actualCompressorIdentifier), sizeof(actualCompressorIdentifier));
-        // Ignore the compressor identifier
-        unsigned int actualCompressorVersion = 0U;
-        inFileStream.read(reinterpret_cast<char*>(&actualCompressorVersion), sizeof(actualCompressorVersion));
-        if (actualCompressorVersion > globalSettings.compressorVersion) {
-            ostringstream errMsg;
-            errMsg << "The compressed file is created with a newer version of Huffmanzip; update Huffmanzip to decompress it";
-            sendMessage(MSG_ERROR, errMsg.str());
-            throw runtime_error(errMsg.str());
-        }
-        unsigned long long actualHuffmanTableSize = 0ULL, actualCompressedSize = 0ULL;
-        unsigned char actualLastByteMask = '\0';
-        inFileStream.read(reinterpret_cast<char*>(&actualHuffmanTableSize), sizeof(actualHuffmanTableSize))
-                    .read(reinterpret_cast<char*>(&actualCompressedSize), sizeof(actualCompressedSize))
-                    .read(reinterpret_cast<char*>(&actualLastByteMask), sizeof(actualLastByteMask));
-        map<unsigned, unsigned char> codeByteMap;
-        for (unsigned long long i = 0ULL; i < actualHuffmanTableSize; i += sizeof(unsigned) + sizeof(unsigned char)) {
-            unsigned char tmpByte = '\0';
-            unsigned tmpCode = 0U;
-            if (inFileStream.read(reinterpret_cast<char*>(&tmpByte), sizeof(tmpByte)).read(reinterpret_cast<char*>(&tmpCode), sizeof(tmpCode))) {
-                codeByteMap[tmpCode] = tmpByte;
-            } else {
-                string errMsgStr = "Failed to load complete Huffman table; the file may be broken";
-                sendMessage(MSG_ERROR, errMsgStr);
-                throw runtime_error(errMsgStr);
-            }
-        }
-        unsigned long long measuredCompressedSize = 0ULL;
-        unsigned char currentByte = '\0', prevByte = '\0';
-        unsigned int currentCode = 1U;
-        if (inFileStream.read(reinterpret_cast<char*>(&prevByte), sizeof(prevByte))) {
-            ++measuredCompressedSize;
-            while (inFileStream.read(reinterpret_cast<char*>(&currentByte), sizeof(currentByte))) {
-                ++measuredCompressedSize;
-                for (int i = 0; i < 8; ++i) {
-                    currentCode = (currentCode << 1) + ((prevByte >> (7 - i)) & 0x1U);
-                    map<unsigned, unsigned char>::iterator iter = codeByteMap.find(currentCode);
-                    if (iter != codeByteMap.end()) {
-                        outFileStream.write(reinterpret_cast<char*>(&iter->second), sizeof(iter->second));
-                        currentCode = 1U;
-                    }
-                }
-                prevByte = currentByte;
-            }
-            // For robustness considerations, it is NOT required that the "dirty bits" in the last byte have to be all 0.
-            for (int i = 0; i < 8; ++i)
-                if ((actualLastByteMask >> (7 - i)) & 0x1U) {
-                    currentCode = (currentCode << 1) + ((prevByte >> (7 - i)) & 0x1U);
-                    map<unsigned, unsigned char>::iterator iter = codeByteMap.find(currentCode);
-                    if (iter != codeByteMap.end()) {
-                        outFileStream.write(reinterpret_cast<char*>(&iter->second), sizeof(iter->second));
-                        currentCode = 1U;
-                    }
-                }
-        }
-        clockAfter = clock();
-        if (actualCompressedSize != measuredCompressedSize)
-            sendMessage(MSG_WARNING, "Claimed and measured compressed data sizes do not match; the file may have been broken");
-        if (sessionSettings.verboseMode) {
-            sendMessage(MSG_INFO, "Decompression completed");
-            ostringstream infoMsg;
-            infoMsg << "Time consumed = " << static_cast<double>(clockAfter - clockBefore) / static_cast<double>(CLOCKS_PER_SEC) << "s";
-            sendMessage(MSG_INFO, infoMsg.str());
-        }
-    }
+    if (sessionSettings.compress)
+        compress(inFileStream, outFileStream);
+    else
+        decompress(inFileStream, outFileStream);
     outFileStream.close();
     inFileStream.close();
     if (sessionSettings.useStdout) {
@@ -320,6 +152,184 @@ void compressCore() {
     if (sessionSettings.useStdout) {
         delete tmpOutFile;
         tmpOutFile = NULL;
+    }
+}
+
+void compress(fstream &inFileStream, fstream &outFileStream) {
+    clock_t clockBefore = 0L, clockAfter = 0L;
+    clockBefore = clock();
+    unsigned byteFrequencies[BYTE_SIZE] = {0U};
+    unsigned long long originalSize = 0ULL;
+    unsigned char tmp = '\0';
+    while (inFileStream.read(reinterpret_cast<char*>(&tmp), sizeof(tmp))) {
+        ++byteFrequencies[tmp];
+        ++originalSize;
+    }
+    priority_queue<BinaryTree<HuffmanNode>*, vector<BinaryTree<HuffmanNode>*>, HuffmanNodeCompare> nodeQueue;
+    for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
+        if (byteFrequencies[i] > 0)
+            nodeQueue.push(new BinaryTree(HuffmanNode(i, byteFrequencies[i])));
+    while (nodeQueue.size() > 1) {
+        BinaryTree<HuffmanNode> *tree1 = nodeQueue.top();
+        nodeQueue.pop();
+        BinaryTree<HuffmanNode> *tree2 = nodeQueue.top();
+        nodeQueue.pop();
+        BinaryTree<HuffmanNode> *treeCombined = new BinaryTree(HuffmanNode('\0', tree1->root()->weight + tree2->root()->weight));
+        treeCombined->move(treeCombined->root().lchild(), tree1->root());
+        treeCombined->move(treeCombined->root().rchild(), tree2->root());
+        nodeQueue.push(treeCombined);
+    }
+    BinaryTree<HuffmanNode> *huffmanTree = NULL;
+    if (!nodeQueue.empty()) {
+        huffmanTree = nodeQueue.top();
+        nodeQueue.pop();
+    } else {
+        huffmanTree = new BinaryTree<HuffmanNode>;
+    }
+    if (huffmanTree->root().lchild().null() && huffmanTree->root().rchild().null()) {
+        BinaryTree<HuffmanNode> *tmpHuffmanTree = new BinaryTree(HuffmanNode('\0', huffmanTree->root()->weight));
+        tmpHuffmanTree->move(tmpHuffmanTree->root().lchild(), huffmanTree->root());
+        huffmanTree = tmpHuffmanTree;
+    }
+    unsigned huffmanCodes[BYTE_SIZE] = {0U};
+    genHuffmanCode(huffmanTree, huffmanCodes);
+    outFileStream.write(reinterpret_cast<char*>(&globalSettings.fileSignature), sizeof(globalSettings.fileSignature));
+    outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorIdentifier), sizeof(globalSettings.compressorIdentifier));
+    outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorVersion), sizeof(globalSettings.compressorVersion));
+    unsigned long long ullPlaceHolder = 0U; unsigned char ucPlaceHolder = '\0';
+    outFileStream.write(reinterpret_cast<char*>(&ullPlaceHolder), sizeof(ullPlaceHolder));
+    outFileStream.write(reinterpret_cast<char*>(&ullPlaceHolder), sizeof(ullPlaceHolder));
+    outFileStream.write(reinterpret_cast<char*>(&ucPlaceHolder), sizeof(ucPlaceHolder));
+    unsigned long long huffmanTableSize = 0ULL;
+    for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
+        if (huffmanCodes[i] != 0U) {
+            unsigned char ci = i;
+            outFileStream.write(reinterpret_cast<char*>(&ci), sizeof(ci));
+            outFileStream.write(reinterpret_cast<char*>(&huffmanCodes[i]), sizeof(huffmanCodes[i]));
+            huffmanTableSize += sizeof(ci) + sizeof(huffmanCodes[i]);
+        }
+    inFileStream.clear();
+    inFileStream.seekg(ios::beg);
+    unsigned char outTmp = '\0';
+    unsigned long long compressedSize = 0ULL;
+    unsigned char currentByte = 0U, currentMask = 0U;
+    // TODO: Use bitwise operations to simply code (and speed up?)
+    while (inFileStream.read(reinterpret_cast<char*>(&outTmp), sizeof(outTmp))) {
+        vector<bool> bits;
+        unsigned huffmanCode = huffmanCodes[outTmp];
+        while (huffmanCode != 0U) {
+            bits.push_back(huffmanCode & 0x1U);
+            huffmanCode >>= 1;
+        }
+        for (vector<bool>::reverse_iterator iter = bits.rbegin() + 1; iter != bits.rend(); ++iter) {
+            currentByte = (currentByte << 1) + *iter;
+            currentMask = (currentMask << 1) + 1;
+            if (currentMask == 0xffU) {
+                outFileStream.write(reinterpret_cast<char*>(&currentByte), sizeof(currentByte));
+                currentByte = 0U;
+                currentMask = 0U;
+                ++compressedSize;
+            }
+        }
+    }
+    if (currentMask == 0x0U) {
+        currentMask = 0xffU;
+    } else {
+        ++compressedSize;
+        for (unsigned char i = currentMask; i != 0xffU; i = (i << 1) + 1, currentByte <<= 1, currentMask <<= 1);
+        outFileStream.write(reinterpret_cast<char*>(&currentByte), sizeof(currentByte));
+    }
+    int huffmanTableSizeOffset = sizeof(globalSettings.fileSignature) + sizeof(globalSettings.compressorIdentifier) + sizeof(globalSettings.compressorVersion),
+        compressedSizeOffset = huffmanTableSizeOffset + sizeof(ullPlaceHolder),
+        lastByteMaskOffset = compressedSizeOffset + sizeof(ullPlaceHolder);
+    outFileStream.seekp(huffmanTableSizeOffset, ios::beg).write(reinterpret_cast<char*>(&huffmanTableSize), sizeof(huffmanTableSize));
+    outFileStream.seekp(compressedSizeOffset, ios::beg).write(reinterpret_cast<char*>(&compressedSize), sizeof(compressedSize));
+    outFileStream.seekp(lastByteMaskOffset, ios::beg).write(reinterpret_cast<char*>(&currentMask), sizeof(currentMask));
+    clockAfter = clock();
+    if (sessionSettings.verboseMode) {
+        sendMessage(MSG_INFO, "Compression completed");
+        unsigned long long totalCompressedSize = lastByteMaskOffset + sizeof(currentMask) + huffmanTableSize + compressedSize;
+        ostringstream infoMsg;
+        infoMsg << "Compression rate = " << static_cast<double>(totalCompressedSize) / static_cast<double>(originalSize) * 100.0 << "%, time consumed = ~" << static_cast<double>(clockAfter - clockBefore) / static_cast<double>(CLOCKS_PER_SEC) << "s";
+        sendMessage(MSG_INFO, infoMsg.str());
+    }
+    delete huffmanTree;
+}
+
+void decompress(fstream &inFileStream, fstream &outFileStream) {
+    clock_t clockBefore = 0L, clockAfter = 0L;
+    clockBefore = clock();
+    unsigned int actualFileSignature = 0U;
+    inFileStream.read(reinterpret_cast<char*>(&actualFileSignature), sizeof(actualFileSignature));
+    if (actualFileSignature != globalSettings.fileSignature) {
+        string errMsgStr = "The file signature does not match; it may be in wrong format or broken";
+        sendMessage(MSG_ERROR, errMsgStr);
+        throw runtime_error(errMsgStr);
+    }
+    char actualCompressorIdentifier[globalSettings.COMPRESSOR_IDENTIFIER_SIZE] = {'\0'};
+    inFileStream.read(reinterpret_cast<char*>(actualCompressorIdentifier), sizeof(actualCompressorIdentifier));
+    // Ignore the compressor identifier
+    unsigned int actualCompressorVersion = 0U;
+    inFileStream.read(reinterpret_cast<char*>(&actualCompressorVersion), sizeof(actualCompressorVersion));
+    if (actualCompressorVersion > globalSettings.compressorVersion) {
+        ostringstream errMsg;
+        errMsg << "The compressed file is created with a newer version of Huffmanzip; update Huffmanzip to decompress it";
+        sendMessage(MSG_ERROR, errMsg.str());
+        throw runtime_error(errMsg.str());
+    }
+    unsigned long long actualHuffmanTableSize = 0ULL, actualCompressedSize = 0ULL;
+    unsigned char actualLastByteMask = '\0';
+    inFileStream.read(reinterpret_cast<char*>(&actualHuffmanTableSize), sizeof(actualHuffmanTableSize))
+                .read(reinterpret_cast<char*>(&actualCompressedSize), sizeof(actualCompressedSize))
+                .read(reinterpret_cast<char*>(&actualLastByteMask), sizeof(actualLastByteMask));
+    map<unsigned, unsigned char> codeByteMap;
+    for (unsigned long long i = 0ULL; i < actualHuffmanTableSize; i += sizeof(unsigned) + sizeof(unsigned char)) {
+        unsigned char tmpByte = '\0';
+        unsigned tmpCode = 0U;
+        if (inFileStream.read(reinterpret_cast<char*>(&tmpByte), sizeof(tmpByte)).read(reinterpret_cast<char*>(&tmpCode), sizeof(tmpCode))) {
+            codeByteMap[tmpCode] = tmpByte;
+        } else {
+            string errMsgStr = "Failed to load complete Huffman table; the file may be broken";
+            sendMessage(MSG_ERROR, errMsgStr);
+            throw runtime_error(errMsgStr);
+        }
+    }
+    unsigned long long measuredCompressedSize = 0ULL;
+    unsigned char currentByte = '\0', prevByte = '\0';
+    unsigned int currentCode = 1U;
+    if (inFileStream.read(reinterpret_cast<char*>(&prevByte), sizeof(prevByte))) {
+        ++measuredCompressedSize;
+        while (inFileStream.read(reinterpret_cast<char*>(&currentByte), sizeof(currentByte))) {
+            ++measuredCompressedSize;
+            for (int i = 0; i < 8; ++i) {
+                currentCode = (currentCode << 1) + ((prevByte >> (7 - i)) & 0x1U);
+                map<unsigned, unsigned char>::iterator iter = codeByteMap.find(currentCode);
+                if (iter != codeByteMap.end()) {
+                    outFileStream.write(reinterpret_cast<char*>(&iter->second), sizeof(iter->second));
+                    currentCode = 1U;
+                }
+            }
+            prevByte = currentByte;
+        }
+        // For robustness considerations, it is NOT required that the "dirty bits" in the last byte have to be all 0.
+        for (int i = 0; i < 8; ++i)
+            if ((actualLastByteMask >> (7 - i)) & 0x1U) {
+                currentCode = (currentCode << 1) + ((prevByte >> (7 - i)) & 0x1U);
+                map<unsigned, unsigned char>::iterator iter = codeByteMap.find(currentCode);
+                if (iter != codeByteMap.end()) {
+                    outFileStream.write(reinterpret_cast<char*>(&iter->second), sizeof(iter->second));
+                    currentCode = 1U;
+                }
+            }
+    }
+    clockAfter = clock();
+    if (actualCompressedSize != measuredCompressedSize)
+        sendMessage(MSG_WARNING, "Claimed and measured compressed data sizes do not match; the file may have been broken");
+    if (sessionSettings.verboseMode) {
+        sendMessage(MSG_INFO, "Decompression completed");
+        ostringstream infoMsg;
+        infoMsg << "Time consumed = " << static_cast<double>(clockAfter - clockBefore) / static_cast<double>(CLOCKS_PER_SEC) << "s";
+        sendMessage(MSG_INFO, infoMsg.str());
     }
 }
 
