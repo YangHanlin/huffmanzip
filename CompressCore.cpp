@@ -1,6 +1,4 @@
 // CompressCore.cpp
-// Note: >1 / != 1
-// TODO: Polishment; implement all features
 
 #include "CompressCore.h"
 #include "Settings.h"
@@ -170,7 +168,7 @@ void compressCore() {
             treeCombined->move(treeCombined->root().rchild(), tree2->root());
             nodeQueue.push(treeCombined);
         }
-        // cout << "Huffman tree has been constructed\n"; // Fucks
+        // cout << "Huffman tree has been constructed\n";
         BinaryTree<HuffmanNode> *huffmanTree = NULL;
         if (!nodeQueue.empty()) {
             huffmanTree = nodeQueue.top();
@@ -192,9 +190,9 @@ void compressCore() {
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorIdentifier), sizeof(globalSettings.compressorIdentifier));
         outFileStream.write(reinterpret_cast<char*>(&globalSettings.compressorVersion), sizeof(globalSettings.compressorVersion));
         unsigned long long ullPlaceHolder = 0U; unsigned char ucPlaceHolder = '\0';
-        outFileStream.write(reinterpret_cast<char*>(&ullPlaceHolder), sizeof(ullPlaceHolder)); // FUck
-        outFileStream.write(reinterpret_cast<char*>(&ullPlaceHolder), sizeof(ullPlaceHolder)); // fuck
-        outFileStream.write(reinterpret_cast<char*>(&ucPlaceHolder), sizeof(ucPlaceHolder)); // fucks
+        outFileStream.write(reinterpret_cast<char*>(&ullPlaceHolder), sizeof(ullPlaceHolder));
+        outFileStream.write(reinterpret_cast<char*>(&ullPlaceHolder), sizeof(ullPlaceHolder));
+        outFileStream.write(reinterpret_cast<char*>(&ucPlaceHolder), sizeof(ucPlaceHolder));
         unsigned long long huffmanTableSize = 0ULL;
         for (size_t i = 0ULL; i < BYTE_SIZE; ++i)
             if (huffmanCodes[i] != 0U) {
