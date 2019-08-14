@@ -4,12 +4,6 @@
 
 > **Notice:** While the [first beta version (`v0.10-beta`)](https://github.com/YangHanlin/huffmanzip/releases/tag/v0.10-beta) has been released, I am still working on the documentation. Please wait for a while.
 
-**Important**: The developer is still working on this project; it will not be ready until after some time. Current status:
-
-```
-Completed (almost) all parts of huffmanzip; working on documentation.
-```
-
 Huffmanzip is a single-file, command-line (toy) compressor & decompressor, using Huffman coding to reduce the size of the file being compressed.
 
 Huffmanzip is:
