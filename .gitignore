@@ -65,6 +65,9 @@ tags
 .history
 
 ### Project-Specific ###
+# Huffmanzip executable on *nix systems
+huffmanzip
+
 # Project indicator
 .project
 
