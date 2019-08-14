@@ -93,4 +93,4 @@ This is only a toy project and may contain many problems owing to my poor progra
 
 ## License
 
-Contents in this repository are licensed under the [GNU Public License 3.0 (GPL-3.0)](LICENSE).
+Contents in this repository are licensed under the [GNU General Public License 3.0 (GPL-3.0)](LICENSE).
