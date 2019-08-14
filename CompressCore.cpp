@@ -186,7 +186,7 @@ void compress(fstream &inFileStream, fstream &outFileStream) {
     } else {
         huffmanTree = new BinaryTree<HuffmanNode>;
     }
-    if (huffmanTree->root().lchild().null() && huffmanTree->root().rchild().null()) {
+    if (!huffmanTree->root().null() && huffmanTree->root().lchild().null() && huffmanTree->root().rchild().null()) {
         BinaryTree<HuffmanNode> *tmpHuffmanTree = new BinaryTree(HuffmanNode('\0', huffmanTree->root()->weight));
         tmpHuffmanTree->move(tmpHuffmanTree->root().lchild(), huffmanTree->root());
         huffmanTree = tmpHuffmanTree;
