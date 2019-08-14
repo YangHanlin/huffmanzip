@@ -74,11 +74,8 @@ tags
 # Autotest result logs
 autotest-result-*.log
 
-# Makefile (ignored as the Makefile is platform-specific)
-Makefile
-
 # Test files
 tests/
 
 # Huffmanzip files
-*.Huffmanzip
+*.huffmanzip
