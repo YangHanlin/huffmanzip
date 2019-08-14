@@ -32,7 +32,7 @@ The usage of Huffmanzip is inspired by [GNU Gzip](https://www.gnu.org/software/g
 - A C++ compiler **with C++ 17 support**
 - Make
 
-> If you would like to build with the attached `Makefile` without any modification, please use GCC or Clang with a compiler named `g++` available and compatible with the syntax of G++.
+> If you would like to build with the attached `Makefile` without any modification, please use [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/) with a compiler named (or aliased) `g++` available and compatible with the syntax of G++.
 
 ### How to build
 
