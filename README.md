@@ -15,9 +15,37 @@ Huffmanzip is:
 
 ## Usage
 
-The usage of Huffmanzip is inspired by [GNU Gzip](https://www.gnu.org/software/gzip/), therefore most of the features and usages may be similar with it.
+The usage of Huffmanzip is inspired by [GNU Gzip](https://www.gnu.org/software/gzip/), therefore most of the features and usages may be similar with it. A reference can be accessed [here](https://github.com/YangHanlin/huffmanzip/wiki/Usage-of-Huffmanzip) in the wiki.
 
-> [WIP] A reference can be accessed [here](https://github.com/YangHanlin/huffmanzip/wiki/Usage-of-Huffmanzip) in the wiki. A more friendly usage (`Quick Start` or `TL;DR`) will be available here in this README later.
+### TL;DR
+
+Here are some examples illustrating the usage of Huffmanzip.
+
+- To compress `example.txt` into `example.txt.huffmanzip`:
+
+  ```bash
+  huffmanzip example.txt
+  ```
+
+- To compress `example.txt` into `example`:
+
+  ```bash
+  huffmanzip example.txt -o example # use -o or --output
+  ```
+
+- To decompress `example.txt.huffmanzip` into `example.txt`:
+
+  ```bash
+  huffmanzip example.txt.huffmanzip # judging from the suffix
+  ```
+
+- To decompress `example` into `example.txt`:
+
+  ```bash
+  huffmanzip example -o example.txt -d
+  ```
+
+  > If the compressed file does not end with `.huffmanzip`, you must explicitly specify the output file (with `-o` or `–output`) and set to decompression mode (with `-d` or `–-decompress`).
 
 ## Building from source
 
@@ -26,7 +54,7 @@ The usage of Huffmanzip is inspired by [GNU Gzip](https://www.gnu.org/software/g
 - A C++ compiler **with C++ 17 support**
 - Make
 
-> If you would like to build with the attached `Makefile` without any modification, please use [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/) with a compiler named (or aliased) `g++` available and compatible with the syntax of G++.
+> **Notice:** If you would like to build with the attached `Makefile` without any modification, please use [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/) with a compiler named (or aliased) `g++` available and compatible with the syntax of G++.
 
 ### How to build
 
