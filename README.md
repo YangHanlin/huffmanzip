@@ -54,7 +54,7 @@ Here are some examples illustrating the usage of Huffmanzip.
 - A C++ compiler **with C++ 17 support**
 - Make
 
-> **Notice:** If you would like to build with the attached `Makefile` without any modification, please use [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/) with a compiler named (or aliased) `g++` available and compatible with the syntax of G++.
+> **Notice:** If you would like to build with the attached `Makefile` without any modification, please use [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/) with a compiler named (or aliased as) `g++` available and compatible with the syntax of G++.
 
 ### How to build
 
@@ -93,4 +93,4 @@ This is only a toy project and may contain many problems owing to my poor progra
 
 ## License
 
-[GPL v3](LICENSE)
+Contents in this repository are licensed under the [GNU Public License 3.0 (GPL-3.0)](LICENSE).
