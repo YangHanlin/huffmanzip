@@ -29,35 +29,41 @@ The usage of Huffmanzip is inspired by [GNU Gzip](https://www.gnu.org/software/g
 
 ### Dependencies
 
-None but a C++ compiler. There are many excellent C++ compilers available, including MSVC (through [Visual Studio](https://visualstudio.microsoft.com/vs/)), G++ (through [GCC, the GNU Compiler Collection](https://gcc.gnu.org/)), Clang++ (through [Clang](http://clang.llvm.org/)), etc.
+- A C++ compiler **with C++ 17 support**
+- Make
+
+> If you would like to build with the attached `Makefile` without any modification, please use GCC or Clang with a compiler named `g++` available and compatible with the syntax of G++.
 
 ### How to build
 
 #### From command line
 
-The main source file is `huffmanzip.cpp`, and the other files are all `#include`d, either directly or indirectly, in this file. So it only requires compilation of `huffmanzip.cpp` to build the whole program.
-
-Take G++ and Linux shell as an example:
+Make the default target to build Huffmanzip:
 
 ```shell
-# Compile the main source file
-g++ huffmanzip.cpp -o huffmanzip
+make
 ```
 
-then run
+then run the following command to make sure it is built:
 
 ```shell
-# Show help info to insure it is built
-./huffmanzip --help
+./huffmanzip -V # on Windows, use '.\huffmanzip.exe -V' instead
 ```
 
-Building with other compilers and/or in other environments are similar with above.
+Huffmanzip should display the version information as follows:
+
+```
+huffmanzip version 0.10-beta (2)
+Last built at 16:07:19 on May 29 2019
+```
+
+You can dig into the attached `Makefile` for more options.
 
 ### In an IDE
 
 If you are using an IDE the building may be easier. Add the source files to create a project and select `Build` or similar actions. Find the built executable in the corresponding directory.
 
-> **Note**: If you are experiencing some strange problems while building, try only adding `huffmanzip.cpp` into your project and force it to build again. This may be caused by the IDE not recognizing the `.ipp` files as headers, and due to the special structure of this program, only adding `huffmanzip.cpp` works as well.
+> **Note**: If you are experiencing some strange problems while building, try excluding `BinaryTree.ipp` from your project and force it to build again. This may be caused by the IDE not recognizing the `.ipp` files as headers.
 
 ## Contributing
 
