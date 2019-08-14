@@ -57,7 +57,7 @@ huffmanzip version 0.10-beta (2)
 Last built at 16:07:19 on May 29 2019
 ```
 
-You can dig into the attached `Makefile` for more options.
+You can dig into the attached [`Makefile`](Makefile) for more options.
 
 #### In an IDE
 
@@ -71,4 +71,4 @@ This is only a toy project and may contain many problems owing to my poor progra
 
 ## License
 
-[GPL v3](https://github.com/YangHanlin/huffmanzip/blob/master/LICENSE)
+[GPL v3](LICENSE)
