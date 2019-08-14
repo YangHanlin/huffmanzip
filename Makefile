@@ -1,5 +1,4 @@
-# This Makefile is to automatically detect the operating system and print
-# correpsonding words.
+# This Makefile will automatically detect OS and take appropriate measures.
 
 CC = g++
 ADDITIONAL_FLAGS = -std=c++17
