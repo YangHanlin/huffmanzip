@@ -59,7 +59,7 @@ Last built at 16:07:19 on May 29 2019
 
 You can dig into the attached `Makefile` for more options.
 
-### In an IDE
+#### In an IDE
 
 If you are using an IDE the building may be easier. Add the source files to create a project and select `Build` or similar actions. Find the built executable in the corresponding directory.
 
