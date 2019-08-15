@@ -67,10 +67,12 @@ endif
 $(EXECUTABLE): CompressCore.o huffmanzip.o Settings.o Util.o
 	$(CC) -o $@ $^ $(ADDITIONAL_FLAGS)
 
-CompressCore.o: CompressCore.cpp CompressCore.h BinaryTree.h BinaryTree.ipp Settings.h Util.h
+CompressCore.o: CompressCore.cpp CompressCore.h BinaryTree.h BinaryTree.ipp \
+                Settings.h Util.h
 	$(CC) -o $@ CompressCore.cpp -c $(ADDITIONAL_FLAGS)
 
-huffmanzip.o: huffmanzip.cpp Settings.h Util.h CompressCore.h BinaryTree.h BinaryTree.ipp
+huffmanzip.o: huffmanzip.cpp Settings.h Util.h CompressCore.h BinaryTree.h \
+              BinaryTree.ipp
 	$(CC) -o $@ huffmanzip.cpp -c $(ADDITIONAL_FLAGS)
 
 Settings.o: Settings.cpp Settings.h Util.h
