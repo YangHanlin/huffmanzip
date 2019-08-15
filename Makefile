@@ -60,9 +60,9 @@ endif
 # build the targets respectively.
 
 # Targets:
-# <Executable Name>(Default):	Build Huffmanzip
-# clean:						Clean all temporary files (object files)
-# clean-target:					Clean the built executable of Huffmanzip
+# <Executable Name>(Default):   Build Huffmanzip
+# clean:                        Clean all temporary files (object files)
+# clean-target:                 Clean the built executable of Huffmanzip
 
 $(EXECUTABLE): CompressCore.o huffmanzip.o Settings.o Util.o
 	$(CC) -o $@ $^ $(ADDITIONAL_FLAGS)
