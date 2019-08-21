@@ -56,6 +56,13 @@ else
 	REMOVE = rm
 endif
 
+# The following section specifies the echo command (all 'echo')
+ifeq ($(OS_TYPE), WIN32)
+	ECHO = echo
+else
+	ECHO = echo
+endif
+
 # The following section defines the targets, dependencies and the commands to
 # build the targets respectively.
 
@@ -63,6 +70,7 @@ endif
 # <Executable Name>(Default):   Build Huffmanzip
 # clean:                        Clean all temporary files (object files)
 # clean-target:                 Clean the built executable of Huffmanzip
+# test:                         Run the test (only a placeholder now)
 
 $(EXECUTABLE): CompressCore.o huffmanzip.o Settings.o Util.o
 	$(CC) -o $@ $^ $(ADDITIONAL_FLAGS)
@@ -88,3 +96,6 @@ clean:
 
 clean-target:
 	-$(REMOVE) $(EXECUTABLE)
+
+test:
+	$(ECHO) Test completed.
