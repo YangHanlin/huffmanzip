@@ -14,7 +14,7 @@ using std::exception;
 int main(int argc, char *argv[]) {
     #ifdef DIRECT_DEBUG
     char *argvCandidate[] = {
-        ".\\huffmanzip.exe"
+        "./huffmanzip"
     };
     argc = sizeof(argvCandidate) / sizeof(argvCandidate[0]);
     argv = argvCandidate;
