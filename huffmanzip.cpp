@@ -1,5 +1,3 @@
-#error This is an error specially set for testing GitHub Actions.
-
 // huffmanzip.cpp
 
 // #define DIRECT_DEBUG
