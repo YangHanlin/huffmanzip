@@ -98,4 +98,4 @@ clean-target:
 	-$(REMOVE) $(EXECUTABLE)
 
 test:
-	$(ECHO) Test completed.
+	@$(ECHO) Test completed.
