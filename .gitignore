@@ -79,6 +79,3 @@ autotest-result-*.log
 
 # Test files
 tests/
-
-# Huffmanzip files
-*.huffmanzip
