@@ -45,25 +45,24 @@ Here are some examples illustrating the usage of Huffmanzip.
   huffmanzip example -o example.txt -d
   ```
 
-  > If the compressed file does not end with `.huffmanzip`, you must explicitly specify the output file (with `-o` or `–output`) and set to decompression mode (with `-d` or `–-decompress`).
+  > If the compressed file does not end with `.huffmanzip`, you must explicitly specify the output file (with `-o` or `–output`) and set to decompression mode (with `-d` or `--decompress`).
 
 ## Building from source
 
 ### Dependencies
 
-- A C++ compiler **with C++ 17 support**
-- Make
-
-> **Notice:** If you would like to build with the attached `Makefile` without any modification, please use [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/) with a compiler named (or aliased as) `g++` available and compatible with the syntax of G++.
+- A C++ compiler **with support of C++17**, along with a build system
+- CMake 3.10 (or later version)
 
 ### How to build
 
 #### From command line
 
-Make the default target to build Huffmanzip:
+Use CMake to generate configuration files and build the executable:
 
 ```shell
-make
+cmake .
+cmake --build .
 ```
 
 then run the following command to make sure it is built:
@@ -78,8 +77,6 @@ Huffmanzip should display the version information as follows:
 huffmanzip version 0.10-beta (2)
 Last built at 16:07:19 on May 29 2019
 ```
-
-You can dig into the attached [`Makefile`](Makefile) for more options.
 
 #### In an IDE
 
