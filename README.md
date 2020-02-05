@@ -45,7 +45,7 @@ Here are some examples illustrating the usage of Huffmanzip.
   huffmanzip example -o example.txt -d
   ```
 
-  > If the compressed file does not end with `.huffmanzip`, you must explicitly specify the output file (with `-o` or `–output`) and set to decompression mode (with `-d` or `--decompress`).
+  > If the compressed file does not end with `.huffmanzip`, you must explicitly specify the output file (with `-o` or `--output`) and set to decompression mode (with `-d` or `--decompress`).
 
 ## Building from source
 
