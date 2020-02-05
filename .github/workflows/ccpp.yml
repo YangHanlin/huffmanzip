@@ -13,7 +13,7 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - name: make
-      run: make
-    - name: make test
-      run: make test
+    - name: Generating required configuration files (CMake)
+      run: cmake .
+    - name: Build (CMake)
+      run: cmake --build .
