@@ -78,6 +78,8 @@ huffmanzip version 0.10-beta (2)
 Last built at 16:07:19 on May 29 2019
 ```
 
+> **Note:** Depending on the generator CMake chooses to use, the executable may not be built in the current directory, so a simple `./huffmanzip -V` (or `.\huffmanzip.exe -V`) may not work. In this case, replace `huffmanzip` with the actual path to the built executable, e.g. `Build/huffmanzip`.
+
 #### In an IDE
 
 If you are using an IDE the building may be easier. Add the source files to create a project and select `Build` or similar actions. Find the built executable in the corresponding directory.
